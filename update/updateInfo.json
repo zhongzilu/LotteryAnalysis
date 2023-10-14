@@ -1,7 +1,10 @@
 {
-  "code": 1,
-  "name": "1.0.0",
-  "filename": "app-release-1.0.0.apk",
-  "url": "https://raw.githubusercontent.com/zhongzilu/LotteryAnalysis/master/update/app-release-1.0.0.apk",
-  "des": "1.添加检查更新功能;\n2.新增双色球开奖记录"
+    "code": 2,
+    "name": "1.0.1",
+    "filename": "app-release-1.0.1.apk",
+    "url": "https://raw.githubusercontent.com/zhongzilu/LotteryAnalysis/master/update/app-release-1.0.1.apk",
+    "ts": 1697282992706,
+    "des": "1.\u4f18\u5316\u5e94\u7528\u66f4\u65b0\u903b\u8f91\uff0c\u589e\u52a0\u4e0b\u8f7d\u8fdb\u5ea6\u548c\u5b89\u88c5\u5305\u5927\u5c0f\u663e\u793a;\n2.\u4f18\u5316\u6570\u636e\u67e5\u8be2\u6548\u7387",
+    "size": 4906121,
+    "md5": "e34732d7a4d09d557041bb7996211c03"
 }
