@@ -1,0 +1,124 @@
+<!--
+  ~
+  ~        ___                       ___       ___
+  ~       /\  \          ___        /\__\     /\__\
+  ~       \:\  \        /\  \      /:/  /    /:/  /
+  ~        \:\  \       \:\  \    /:/  /    /:/  /
+  ~         \:\  \      /::\__\  /:/  /    /:/  /  ___
+  ~   _______\:\__\  __/:/\/__/ /:/__/    /:/__/  /\__\
+  ~   \::::::::/__/ /\/:/  /    \:\  \    \:\  \ /:/  /
+  ~    \:\~~\~~     \::/__/      \:\  \    \:\  /:/  /
+  ~     \:\  \       \:\__\       \:\  \    \:\/:/  /
+  ~      \:\__\       \/__/        \:\__\    \::/  /
+  ~       \/__/                     \/__/     \/__/
+  ~
+  ~  Copyright (C) 2019 ZiLu https://github.com/zhongzilu
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<resources>
+    <string name="app_name">大乐透</string>
+    <string name="activity_lottery_label">大乐透</string>
+    <string name="title_home">首页</string>
+    <string name="title_dashboard">控制台</string>
+    <string name="title_trick">技巧</string>
+    <string name="title_notifications">通知</string>
+    <string name="title_mine">我的</string>
+    <string name="title_kaijiang">开奖</string>
+    <string name="title_group">圈子</string>
+    <string name="title_activity_jsoup">数据初始化</string>
+    <string name="toast_update_in_background">正在后台下载应用，请不要退出！</string>
+    <string name="toast_download_success">下载成功,请点击[立即安装]</string>
+    <string name="toast_download_fail">下载失败</string>
+    <string name="dialog_confirm_text">马上更新 (%.1fM)</string>
+    <string name="dialog_cancel_text">下次再说</string>
+
+    <string name="dashboard_log_hint">点击右下角按钮进行本地数据更新</string>
+    <string name="user_agent">Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0</string>
+    <string name="lottery_history_url">https://datachart.500.com/dlt/history/newinc/history.php?start=%s&amp;end=</string>
+    <string name="ssq_history_url">https://datachart.500.com/ssq/history/newinc/history.php?start=%s&amp;end=</string>
+    <string name="pls_history_url">https://datachart.500.com/pls/history/inc/history.php?limit=-1&amp;start=%s&amp;end=</string>
+    <string name="plw_history_url">https://datachart.500.com/plw/history/inc/history.php?limit=-1&amp;start=%s&amp;end=</string>
+    <string name="sd_history_url">https://datachart.500.com/sd/history/inc/history.php?limit=-1&amp;start=%s&amp;end=%s</string>
+    <string name="format_release_jackpot">奖池累计%s亿</string>
+
+    <string name="prompt_issue">按期数筛选</string>
+    <string name="prompt_year">按年份筛选</string>
+    <string-array name="issues">
+        <item>30期</item>
+        <item>50期</item>
+        <item>100期</item>
+    </string-array>
+
+    <string-array name="r5p_analysis_tabs">
+        <item>前区5分区形态分析</item>
+        <item>各区形态连续分析</item>
+        <item>各区形态间隔分析</item>
+        <item>前区5分区遗漏统计</item>
+        <item>1区形态分析</item>
+        <item>2区形态分析</item>
+        <item>3区形态分析</item>
+        <item>4区形态分析</item>
+        <item>5区形态分析</item>
+    </string-array>
+
+    <string-array name="r7p_analysis_tabs">
+        <item>前区7分区形态分析</item>
+        <item>各区形态连续分析</item>
+        <item>各区形态间隔分析</item>
+        <item>前区7分区遗漏统计</item>
+        <item>1区形态分析</item>
+        <item>2区形态分析</item>
+        <item>3区形态分析</item>
+        <item>4区形态分析</item>
+        <item>5区形态分析</item>
+        <item>6区形态分析</item>
+        <item>7区形态分析</item>
+    </string-array>
+
+    <string-array name="lottery_red_tabs">
+        <item>5分区统计</item>
+        <item>7分区统计</item>
+        <item>尾号分区统计</item>
+        <item>奇偶号统计</item>
+        <item>大小号统计</item>
+        <item>质合统计</item>
+        <item>连号统计</item>
+        <item>上期传号统计</item>
+        <item>上期邻号统计</item>
+        <item>温热号统计</item>
+        <item>遗漏号统计</item>
+    </string-array>
+
+    <string-array name="lottery_blue_tabs">
+        <item>4分区统计</item>
+        <item>奇偶号比统计</item>
+        <item>大小号比统计</item>
+        <item>质合号比统计</item>
+        <item>连号组数统计</item>
+        <item>尾号组数统计</item>
+        <item>上期传号统计</item>
+        <item>温热号统计</item>
+        <item>上期邻号统计</item>
+        <item>遗漏号统计</item>
+    </string-array>
+
+    <string-array name="lottery_top_tabs">
+        <item>基本走势</item>
+        <item>前区数据</item>
+        <item>后区数据</item>
+    </string-array>
+
+    <string name="readme_partition_type"><b>解释说明<span>&#128071;</span>:</b>\n\n<b>当前统计: </b>是指通过按期数或按年份进行筛选数据之后的数据统计结果\n\n<b>(xx年)统计: </b>这里只显示本年度已开奖的数据统计结果\n\n<b>历史统计: </b>这里显示的是所有的历史开奖数据的统计结果</string>
+</resources>

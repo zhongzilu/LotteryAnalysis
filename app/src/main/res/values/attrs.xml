@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~        ___                       ___       ___
+  ~       /\  \          ___        /\__\     /\__\
+  ~       \:\  \        /\  \      /:/  /    /:/  /
+  ~        \:\  \       \:\  \    /:/  /    /:/  /
+  ~         \:\  \      /::\__\  /:/  /    /:/  /  ___
+  ~   _______\:\__\  __/:/\/__/ /:/__/    /:/__/  /\__\
+  ~   \::::::::/__/ /\/:/  /    \:\  \    \:\  \ /:/  /
+  ~    \:\~~\~~     \::/__/      \:\  \    \:\  /:/  /
+  ~     \:\  \       \:\__\       \:\  \    \:\/:/  /
+  ~      \:\__\       \/__/        \:\__\    \::/  /
+  ~       \/__/                     \/__/     \/__/
+  ~
+  ~  Copyright (C) 2019 ZiLu https://github.com/zhongzilu
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<resources>
+    <declare-styleable name="MyTabLayout">
+        <attr name="tabItems" format="reference" />
+        <attr name="tabSelectMode" format="flags">
+            <flag name="none" value="0" />
+            <flag name="selected" value="1" />
+        </attr>
+        <attr name="tabSelectPosition" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="ReleaseBallView">
+        <attr name="ballRedBackground" format="reference|color" />
+        <attr name="ballBlueBackground" format="reference|color" />
+        <attr name="ballSize" format="dimension" />
+        <attr name="ballText" format="color" />
+        <attr name="ballTextColor" format="color" />
+        <attr name="ballTextSize" format="dimension" />
+        <attr name="ballSpace" format="dimension" />
+        <!--        <attr name="ballPadding" format="dimension" />-->
+        <!--        <attr name="ballPaddingStart" format="dimension" />-->
+        <!--        <attr name="ballPaddingEnd" format="dimension" />-->
+        <!--        <attr name="ballPaddingTop" format="dimension" />-->
+        <!--        <attr name="ballPaddingBottom" format="dimension" />-->
+        <!--        <attr name="ballMargin" format="dimension" />-->
+        <!--        <attr name="ballMarginStart" format="dimension" />-->
+        <!--        <attr name="ballMarginEnd" format="dimension" />-->
+        <!--        <attr name="ballMarginTop" format="dimension" />-->
+        <!--        <attr name="ballMarginBottom" format="dimension" />-->
+        <attr name="ballGravity" format="flags">
+            <flag name="start" value="0x00800003" />
+            <flag name="end" value="0x00800005" />
+        </attr>
+        <attr name="ballRedLimit" format="integer" />
+        <attr name="ballBlueLimit" format="integer" />
+        <attr name="ballRedBlueSpace" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="MaxHeightNestedScrollView">
+        <attr name="android:maxHeight"/>
+    </declare-styleable>
+</resources>

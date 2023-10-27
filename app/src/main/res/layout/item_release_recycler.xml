@@ -1,0 +1,143 @@
+<!--
+  ~
+  ~        ___                       ___       ___
+  ~       /\  \          ___        /\__\     /\__\
+  ~       \:\  \        /\  \      /:/  /    /:/  /
+  ~        \:\  \       \:\  \    /:/  /    /:/  /
+  ~         \:\  \      /::\__\  /:/  /    /:/  /  ___
+  ~   _______\:\__\  __/:/\/__/ /:/__/    /:/__/  /\__\
+  ~   \::::::::/__/ /\/:/  /    \:\  \    \:\  \ /:/  /
+  ~    \:\~~\~~     \::/__/      \:\  \    \:\  /:/  /
+  ~     \:\  \       \:\__\       \:\  \    \:\/:/  /
+  ~      \:\__\       \/__/        \:\__\    \::/  /
+  ~       \/__/                     \/__/     \/__/
+  ~
+  ~  Copyright (C) 2019 ZiLu https://github.com/zhongzilu
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="5dp"
+    android:clickable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="5dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/itemIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearance="@style/SharpCircleStyle"
+            tools:src="@mipmap/ic_lottery" />
+
+        <TextView
+            android:id="@+id/itemTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/itemIcon"
+            app:layout_constraintStart_toEndOf="@id/itemIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="XXX" />
+
+        <TextView
+            android:id="@+id/itemReleaseDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            app:layout_constraintBottom_toBottomOf="@id/itemIcon"
+            app:layout_constraintStart_toEndOf="@id/itemTitle"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="周二、四、日 21：15" />
+
+        <TextView
+            android:id="@+id/itemQiHao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/itemIcon"
+            tools:text="第0000000期 09-08(五)" />
+
+        <TextView
+            android:id="@+id/itemJackpot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/itemIcon"
+            tools:text="累计00.00亿" />
+
+        <zilu.lottery.analysis.widget.ReleaseBallView2
+            android:id="@+id/releaseBallView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@id/itemQiHao" />
+
+        <TextView
+            android:id="@+id/itemBtn1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:gravity="center"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="投注优化"
+            android:textColor="@android:color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/releaseBallView" />
+
+        <TextView
+            android:id="@+id/itemBtn2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:gravity="center"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="中奖查询"
+            android:textColor="@android:color/black"
+            app:layout_constraintStart_toEndOf="@id/itemBtn1"
+            app:layout_constraintTop_toBottomOf="@id/releaseBallView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

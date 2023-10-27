@@ -1,0 +1,144 @@
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
+
+import java.security.MessageDigest
+
+/*
+ *
+ *        ___                       ___       ___
+ *       /\  \          ___        /\__\     /\__\
+ *       \:\  \        /\  \      /:/  /    /:/  /
+ *        \:\  \       \:\  \    /:/  /    /:/  /
+ *         \:\  \      /::\__\  /:/  /    /:/  /  ___
+ *   _______\:\__\  __/:/\/__/ /:/__/    /:/__/  /\__\
+ *   \::::::::/__/ /\/:/  /    \:\  \    \:\  \ /:/  /
+ *    \:\~~\~~     \::/__/      \:\  \    \:\  /:/  /
+ *     \:\  \       \:\__\       \:\  \    \:\/:/  /
+ *      \:\__\       \/__/        \:\__\    \::/  /
+ *       \/__/                     \/__/     \/__/
+ *
+ *  Copyright (C) 2019 ZiLu https://github.com/zhongzilu
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+ext.buildInfo = [
+        versionName       : "${android.defaultConfig.versionName}",
+        versionCode       : android.defaultConfig.versionCode,
+        updatePath        : 'update',
+        updateBaseUrl     : 'https://raw.githubusercontent.com/zhongzilu/LotteryAnalysis/master/update/',
+//        updateBaseUrl     : 'https://raw.githubusercontent.com/SirLYC/EveryDownload/master/update/',
+        updateInfoFilename: 'updateInfo.json',
+        versionDes        : "1.[优化]检查并删除旧安装包,避免占用空间;\n2.修复统计算法出现的数据不一致问题;\n3.更新数据的存储方式;",
+]
+
+android.buildTypes.all { buildType ->
+    buildType.buildConfigField("String", "RAW_URL", "\"https://ghproxy.com/${buildInfo.updateBaseUrl}${buildInfo.updateInfoFilename}\"")
+//        buildType.buildConfigField("String", "APK_NAME", "\"${"app-${buildType.name}-${buildInfo.versionName}.apk"}\"")
+//        buildType.buildConfigField("String", "INFO_FILE_NAME", "\"${buildInfo.updateInfoFilename}\"")
+}
+
+android.applicationVariants.all { variant ->
+    // 统一App名，方便操作
+    def buildType = variant.buildType.name
+    def apkName = "app-$buildType-${buildInfo.versionName}.apk"
+    variant.outputs.all {
+        outputFileName = apkName
+    }
+    // 只在release添加
+    if (buildType == "release") {
+        //直接添加到Task的Action队尾，build执行完成后就可以执行这个函数
+        variant.assembleProvider.get().doLast {
+            generateUpdateInfo(buildType, apkName)
+        }
+    }
+}
+
+// 计算apk的md5
+static String generateMD5(File file) {
+    if (!file.exists() || !file.isFile()) {
+        return null
+    }
+    def digest = MessageDigest.getInstance("MD5")
+    file.withInputStream() { is ->
+        byte[] buffer = new byte[8192]
+        int read
+        while ((read = is.read(buffer)) > 0) {
+            digest.update(buffer, 0, read)
+        }
+    }
+    return digest.digest().encodeHex().toString()
+}
+
+void generateUpdateInfo(String buildType, String apkName) {
+    println("------------------ Generating version info ------------------")
+    // 把apk文件从build目录复制到根项目的update文件夹下
+    def apkFile = project.file("build/outputs/apk/$buildType/$apkName")
+    if (!apkFile.exists()) {
+        throw new GradleScriptException("apk file not exist!")
+    }
+    def toDir = rootProject.file(buildInfo.updatePath)
+    String apkHash = generateMD5(apkFile)
+    def updateJsonFile = new File(toDir, buildInfo.updateInfoFilename)
+    def writeNewFile = true
+
+    // 如果有以前的json文件，检查这次打包是否有改变
+    if (updateJsonFile.exists()) {
+        try {
+            def oldUpdateInfo = new JsonSlurper().parse(updateJsonFile)
+            if (buildInfo.versionCode <= oldUpdateInfo.code && apkHash == oldUpdateInfo.md5) {
+                writeNewFile = false
+            }
+        } catch (Exception e) {
+            writeNewFile = true
+            e.printStackTrace()
+            updateJsonFile.delete()
+        }
+    }
+
+    if (writeNewFile) {
+//        def oldFiles = toDir.listFiles()
+//        oldFiles.each {
+//            if (!it.delete()) {
+//                it.deleteOnExit()
+//            }
+//        }
+        copy {
+            from(apkFile)
+            into(toDir)
+        }
+
+        // 创建json的实体类
+        // Expando可以简单理解为Map
+        def updateInfo = new Expando(
+                code: buildInfo.versionCode,
+                name: buildInfo.versionName,
+                filename: apkFile.name,
+                url: "${buildInfo.updateBaseUrl}${apkFile.name}",
+                ts: System.currentTimeMillis(),
+                des: buildInfo.versionDes,
+                size: apkFile.length(),
+                md5: apkHash
+        )
+        def outputJson = new JsonBuilder(updateInfo).toPrettyString()
+        println(outputJson)
+        // 将json写入文件中，用于查询更新
+        updateJsonFile.write(outputJson)
+    } else {
+        // 不需要更新
+        println("This version is already released.\n" +
+                "VersionCode = ${buildInfo.versionCode}\n" +
+                "Skip generateUpdateInfo.")
+    }
+    println("------------------ Finish Generating version info ------------------")
+}
