@@ -1,10 +1,10 @@
 {
-    "code": 3,
-    "name": "1.0.2",
-    "filename": "app-release-1.0.2.apk",
-    "url": "https://raw.githubusercontent.com/zhongzilu/LotteryAnalysis/master/update/app-release-1.0.2.apk",
-    "ts": 1697894165276,
-    "des": "1.\u5b9e\u73b0\u524d\u533a5\u5206\u533a\u548c7\u5206\u533a\u7684\u5404\u533a\u5f62\u6001\u8fde\u7eed\u5206\u6790;\n2.\u8c03\u6574\u8868\u683c\u663e\u793a\u5b57\u4f53\u5927\u5c0f\u548c\u95f4\u8ddd",
-    "size": 4908593,
-    "md5": "0fe1cfd8a72114a95826a2e3dfd5c48b"
+    "code": 4,
+    "name": "1.0.3",
+    "filename": "app-release-1.0.3.apk",
+    "url": "https://raw.githubusercontent.com/zhongzilu/LotteryAnalysis/master/update/app-release-1.0.3.apk",
+    "ts": 1698417292672,
+    "des": "1.\u4f18\u5316\u7edf\u8ba1\u7b97\u6cd5;\n2.\u4fee\u590d\u7edf\u8ba1\u7b97\u6cd5\u51fa\u73b0\u7684\u6570\u636e\u4e0d\u4e00\u81f4\u95ee\u9898;\n3.\u66f4\u65b0\u6570\u636e\u7684\u5b58\u50a8\u65b9\u5f0f;",
+    "size": 4910365,
+    "md5": "98eeefcb36d2672daf885dc6b116d1d2"
 }
