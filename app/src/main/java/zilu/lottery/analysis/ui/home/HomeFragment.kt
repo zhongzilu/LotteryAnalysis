@@ -41,6 +41,7 @@ import com.bumptech.glide.Glide
 import com.stx.xhb.androidx.XBanner
 import zilu.lottery.analysis.R
 import zilu.lottery.analysis.activity.LotteryActivity
+import zilu.lottery.analysis.activity.ToolsActivity
 import zilu.lottery.analysis.adapter.HomeGridAdapter
 import zilu.lottery.analysis.adapter.RVItemClickListener
 import zilu.lottery.analysis.bean.BannerItem
@@ -127,6 +128,10 @@ class HomeFragment : BaseFragment() {
 
     private val homeToolRecyclerListener = object : RVItemClickListener<HomeGridAdapter.VH> {
         override fun onItemClickListener(holder: HomeGridAdapter.VH, v: View, position: Int) {
+            when (mHomeToolAdapter.getItemData(position).id) {
+                "tool1" -> startActivity(Intent(activity, ToolsActivity::class.java))
+                else -> Unit
+            }
         }
     }
 }

@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        checkVersionUpdate()
+        if (!BuildConfig.DEBUG) checkVersionUpdate()
     }
 
     override fun onDestroy() {

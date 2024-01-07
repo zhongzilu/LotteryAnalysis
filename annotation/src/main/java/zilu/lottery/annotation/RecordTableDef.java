@@ -27,49 +27,51 @@
  *  limitations under the License.
  */
 
-package zilu.lottery.analysis
-
-import android.app.Application
-import android.content.Context
-import android.content.Intent
-import com.google.gson.Gson
-import org.jetbrains.anko.doAsync
+package zilu.lottery.annotation;
 
 /**
- *
- * Create by zilu 2023/08/10
+ * 投注优化 - 选号记录历史数据表字段定义
+ * Create by zilu 2023/09/22
  */
-class App : Application() {
+public @interface RecordTableDef {
 
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-        if (!BuildConfig.DEBUG) startService(Intent(base, UpdateDataService::class.java))
-    }
+    /**
+     * 表名
+     */
+    String NAME = "records";
 
-    override fun onCreate() {
-        super.onCreate()
-        deleteOldApk()
-    }
+    /**
+     * 自增长id
+     */
+    String ID = "id";
 
-    private fun deleteOldApk() {
-        doAsync {
-            getExternalFilesDir("")?.listFiles { file ->
-                file.name.endsWith(".apk")
-            }?.forEach { it.delete() }
-        }
-    }
+    /**
+     * 红球选号记录
+     */
+    String R_BALLS = "rb";
+
+    /**
+     * 蓝球选号记录
+     */
+    String B_BALLS = "bb";
+
+    /**
+     * 临时数据标记，0: 历史性的(永久性的); 1: 临时性的
+     */
+    String TEMP = "tmp";
+
+    /**
+     * 选择的号码属于什么彩种
+     */
+    String TYPE = "type";
+
+    /**
+     * 创建日期
+     */
+    String DATE = "date";
+
+    /**
+     * 更新日期
+     */
+    String UPDATE = "udate";
 }
-
-val gson: Gson by lazy { Gson() }
-
-//fun View.visible() {
-//    visibility = View.VISIBLE
-//}
-//
-//fun View.gone() {
-//    visibility = View.GONE
-//}
-//
-//fun View.invisible() {
-//    visibility = View.INVISIBLE
-//}

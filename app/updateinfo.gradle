@@ -38,7 +38,7 @@ ext.buildInfo = [
         updatePath        : 'update',
         updateBaseUrl     : 'https://raw.githubusercontent.com/zhongzilu/LotteryAnalysis/master/update/',
         updateInfoFilename: 'updateInfo.json',
-        versionDes        : "1.[优化]检查并删除旧安装包,避免占用空间;\n2.修复统计算法出现的数据不一致问题;\n3.更新数据的存储方式;",
+        versionDes        : "1.[新增]投注优化部分功能;",
         updateProxy       : 'https://mirror.ghproxy.com/'
 ]
 

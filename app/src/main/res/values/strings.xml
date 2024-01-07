@@ -30,6 +30,7 @@
 <resources>
     <string name="app_name">大乐透</string>
     <string name="activity_lottery_label">大乐透</string>
+    <string name="activity_tools_label">投注优化</string>
     <string name="title_home">首页</string>
     <string name="title_dashboard">控制台</string>
     <string name="title_trick">技巧</string>
@@ -54,6 +55,12 @@
     <string name="sd_history_url">https://datachart.500.com/sd/history/inc/history.php?limit=%d&amp;start=%s&amp;end=%s</string>
     <string name="format_release_jackpot">奖池累计%s亿</string>
     <string name="format_release_sale_amount">销售总额%s亿</string>
+    <string name="format_tools_red_ball_label">至少选%d个红球</string>
+    <string name="format_tools_blue_ball_label">至少选%d个蓝球</string>
+    <string name="msg_selected_num_record_help">1.按住一条选号记录往左滑动，是删除该条记录;\n2.按住一条选号记录往右滑动，是修改该条记录;\n3.点击一条选号记录则进行条件筛选;\n4.下拉可以进行数据刷新;</string>
+    <string name="toast_refresh_complete">刷新成功</string>
+    <string name="title_help">帮助</string>
+    <string name="msg_developing">努力开发中, 敬请期待!</string>
 
     <string name="prompt_issue">按期数筛选</string>
     <string name="prompt_year">按年份筛选</string>

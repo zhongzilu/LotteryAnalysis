@@ -45,7 +45,7 @@ private class SQL(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null, DB
 
     companion object {
         const val DB_NAME = "data.db"
-        const val DB_VERSION = 12
+        const val DB_VERSION = 13
 
         @JvmStatic
         val instance: SQL by lazy { SQL(ApplicationContext.get()) }
@@ -108,14 +108,24 @@ private class SQL(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null, DB
             MapTableDef.VALUE to TEXT,
             MapTableDef.DATE to INTEGER
         )
+        db.createTable(
+            RecordTableDef.NAME, true,
+            RecordTableDef.ID to INTEGER + PRIMARY_KEY,
+            RecordTableDef.R_BALLS to TEXT,
+            RecordTableDef.B_BALLS to TEXT,
+            RecordTableDef.TEMP to INTEGER,
+            RecordTableDef.TYPE to TEXT,
+            RecordTableDef.DATE to TEXT,
+            RecordTableDef.UPDATE to TEXT
+        )
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
 //        db?.dropTable(LotteryTableDef.NAME, true)
 //        db?.dropTable(MapTableDef.NAME, true)
 //        db?.dropTable(SSQTableDef.NAME, true)
-        db?.dropTable(PLSTableDef.NAME, true)
-        db?.dropTable(PLWTableDef.NAME, true)
+//        db?.dropTable(PLSTableDef.NAME, true)
+//        db?.dropTable(PLWTableDef.NAME, true)
         onCreate(db)
     }
 
@@ -615,5 +625,114 @@ object PLWTable {
         SQL.instance.use {
             delete(PLWTableDef.NAME)
         }
+    }
+}
+
+/**
+ * 记录数据库表对象，用于存储投注优化的选号记录
+ */
+object RecordTable {
+
+    @JvmStatic
+    fun save(r: Record) {
+        SQL.instance.use {
+            try {
+                beginTransaction()
+                val i = insert(
+                    RecordTableDef.NAME,
+                    RecordTableDef.R_BALLS to r.rballs,
+                    RecordTableDef.B_BALLS to r.bballs,
+                    RecordTableDef.TEMP to r.tmp,
+                    RecordTableDef.TYPE to r.type,
+                    RecordTableDef.DATE to r.date,
+                    RecordTableDef.UPDATE to r.update,
+                )
+                if (i == -1L) throw SQLException("Error inserting $r")
+                setTransactionSuccessful()
+            } finally {
+                endTransaction()
+            }
+        }
+    }
+
+    private val rowParser =
+        rowParser { id: Int, rb: String, bb: String, tmp: Int, type: String, date: String, udate: String ->
+            Record(id, rb, bb, tmp != 0, type, date, udate)
+        }
+
+    /**
+     * 获取所有的记录
+     * @return List<Record>
+     */
+    @JvmStatic
+    fun findAll(): List<Record> = SQL.instance.use {
+        select(RecordTableDef.NAME).parseList(rowParser)
+    }
+
+    /**
+     * 获取最近的选号记录，也可能没有记录
+     */
+    @JvmStatic
+    fun findLatest(): Record? = SQL.instance.use {
+        select(RecordTableDef.NAME)
+            .orderBy(RecordTableDef.ID, SqlOrderDirection.DESC)
+            .limit(1)
+            .parseOpt(rowParser)
+    }
+
+    @JvmStatic
+    fun findById(id: Int): Record = SQL.instance.use {
+        select(RecordTableDef.NAME)
+            .whereArgs("${RecordTableDef.ID} = {id}", "id" to id)
+            .parseSingle(rowParser)
+    }
+
+    @JvmStatic
+    fun findByTmp(tmp: Boolean): List<Record> = SQL.instance.use {
+        select(RecordTableDef.NAME)
+            .whereArgs("${RecordTableDef.TEMP} = {tmp}", "tmp" to if (tmp) 1 else 0)
+            .parseList(rowParser)
+    }
+
+    @JvmStatic
+    fun findByLimit(limit: Int): List<Record> = SQL.instance.use {
+        if (limit == 0) return@use emptyList()
+        select(RecordTableDef.NAME)
+            .orderBy(RecordTableDef.ID, SqlOrderDirection.DESC)
+            .limit(limit)
+            .parseList(rowParser)
+    }
+
+    @JvmStatic
+    fun count(): Int = SQL.instance.use {
+        select(RecordTableDef.NAME, "COUNT(${RecordTableDef.ID})").parseSingle(IntParser)
+    }
+
+    /**
+     * 清除所有纪录
+     */
+    @JvmStatic
+    fun delete() {
+        SQL.instance.use {
+            delete(RecordTableDef.NAME)
+        }
+    }
+
+    @JvmStatic
+    fun deleteById(id: Int) = SQL.instance.use {
+        delete(RecordTableDef.NAME, "${RecordTableDef.ID} = {id}", "id" to id)
+    }
+
+    @JvmStatic
+    fun update(record: Record) = SQL.instance.use {
+        update(
+            RecordTableDef.NAME,
+            RecordTableDef.R_BALLS to record.rballs,
+            RecordTableDef.B_BALLS to record.bballs,
+            RecordTableDef.TEMP to record.tmp,
+            RecordTableDef.TYPE to record.type,
+            RecordTableDef.UPDATE to record.update
+        ).whereArgs("${RecordTableDef.ID} = {id}", "id" to record.id)
+            .exec()
     }
 }

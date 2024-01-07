@@ -111,7 +111,10 @@ class ReleaseItem {
     @JvmField
     val balls: String
 
-    constructor() : this(0, "", "", "", "", "")
+    @JvmField
+    val type: String
+
+    constructor() : this(0, "", "", "", "", "", "")
 
     constructor(
         iconRes: Int,
@@ -119,7 +122,8 @@ class ReleaseItem {
         date: String,
         qihao: String,
         jackpot: CharSequence,
-        balls: String
+        balls: String,
+        type: String
     ) {
         this.iconRes = iconRes
         this.title = title
@@ -127,5 +131,6 @@ class ReleaseItem {
         this.qihao = qihao
         this.jackpot = jackpot
         this.balls = balls
+        this.type = type
     }
 }

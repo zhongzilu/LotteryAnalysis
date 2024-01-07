@@ -41,7 +41,10 @@ import kotlinx.coroutines.cancel
  *
  * Create by zilu 2023/08/09
  */
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment : Fragment {
+
+    constructor() : super()
+    constructor(contentLayoutId: Int) : super(contentLayoutId)
 
     @JvmField
     protected var container: ViewGroup? = null
@@ -52,6 +55,17 @@ abstract class BaseFragment : Fragment() {
     @JvmField
     protected val mainScope = MainScope()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+//        activity?.onBackPressedDispatcher?.addCallback(this,
+//            object : OnBackPressedCallback(true) {
+//                override fun handleOnBackPressed() {
+//                    onBackPressed(this)
+//                }
+//            })
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,6 +73,46 @@ abstract class BaseFragment : Fragment() {
     ): View? {
         this.container = container
         return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    protected open fun containerId(): Int = 0
+
+    protected open fun replaceFragment(fragment: Fragment) {
+        val containerId = containerId()
+        if (containerId == 0) throw IllegalArgumentException("You must override the containerId() method.")
+        replaceFragment(containerId, fragment)
+    }
+
+    protected open fun replaceFragment(
+        containerId: Int,
+        fragment: Fragment,
+        backStack: Boolean = false
+    ) {
+        replaceFragment(containerId, fragment, fragment.javaClass.simpleName, backStack)
+    }
+
+    protected open fun replaceFragment(
+        containerId: Int,
+        fragment: Fragment,
+        tag: String?,
+        backStack: Boolean = false
+    ) {
+        val manager = requireActivity().supportFragmentManager
+        val transaction = manager.beginTransaction()
+        val f = manager.findFragmentByTag(tag)
+        if (backStack && f == null) {
+            transaction.setReorderingAllowed(true)
+            transaction.replace(containerId, fragment, tag)
+            transaction.addToBackStack(tag)
+            transaction.commitAllowingStateLoss()
+        } else {
+            if (f == null) {
+                transaction.replace(containerId, fragment, tag)
+            } else {
+                transaction.show(f)
+            }
+            transaction.commit()
+        }
     }
 
     override fun onDestroy() {

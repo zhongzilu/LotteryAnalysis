@@ -65,6 +65,18 @@
     </declare-styleable>
 
     <declare-styleable name="MaxHeightNestedScrollView">
-        <attr name="android:maxHeight"/>
+        <attr name="android:maxHeight" />
+    </declare-styleable>
+
+    <declare-styleable name="CircleBallView">
+        <attr name="android:checked" format="boolean" />
+        <attr name="android:background" format="reference" />
+        <attr name="android:textColor" format="reference|color" />
+        <attr name="selectedDrawable" format="reference" />
+        <attr name="selectedTextColor" format="reference|color" />
+    </declare-styleable>
+
+    <declare-styleable name="MyRadioGroup">
+        <attr name="android:enabled" format="boolean" />
     </declare-styleable>
 </resources>

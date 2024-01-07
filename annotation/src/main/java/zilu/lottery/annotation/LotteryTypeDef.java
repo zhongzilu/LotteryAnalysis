@@ -27,49 +27,30 @@
  *  limitations under the License.
  */
 
-package zilu.lottery.analysis
-
-import android.app.Application
-import android.content.Context
-import android.content.Intent
-import com.google.gson.Gson
-import org.jetbrains.anko.doAsync
+package zilu.lottery.annotation;
 
 /**
- *
- * Create by zilu 2023/08/10
+ * 彩票种类分类
+ * Create by zilu 2024/01/05
  */
-class App : Application() {
+public @interface LotteryTypeDef {
+    /**
+     * 大乐透
+     */
+    String DLT = "dlt";
 
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-        if (!BuildConfig.DEBUG) startService(Intent(base, UpdateDataService::class.java))
-    }
+    /**
+     * 双色球
+     */
+    String SSQ = "ssq";
 
-    override fun onCreate() {
-        super.onCreate()
-        deleteOldApk()
-    }
+    /**
+     * 排列三
+     */
+    String PLS = "pls";
 
-    private fun deleteOldApk() {
-        doAsync {
-            getExternalFilesDir("")?.listFiles { file ->
-                file.name.endsWith(".apk")
-            }?.forEach { it.delete() }
-        }
-    }
+    /**
+     * 排列五
+     */
+    String PLW = "plw";
 }
-
-val gson: Gson by lazy { Gson() }
-
-//fun View.visible() {
-//    visibility = View.VISIBLE
-//}
-//
-//fun View.gone() {
-//    visibility = View.GONE
-//}
-//
-//fun View.invisible() {
-//    visibility = View.INVISIBLE
-//}

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~        ___                       ___       ___
+  ~       /\  \          ___        /\__\     /\__\
+  ~       \:\  \        /\  \      /:/  /    /:/  /
+  ~        \:\  \       \:\  \    /:/  /    /:/  /
+  ~         \:\  \      /::\__\  /:/  /    /:/  /  ___
+  ~   _______\:\__\  __/:/\/__/ /:/__/    /:/__/  /\__\
+  ~   \::::::::/__/ /\/:/  /    \:\  \    \:\  \ /:/  /
+  ~    \:\~~\~~     \::/__/      \:\  \    \:\  /:/  /
+  ~     \:\  \       \:\__\       \:\  \    \:\/:/  /
+  ~      \:\__\       \/__/        \:\__\    \::/  /
+  ~       \/__/                     \/__/     \/__/
+  ~
+  ~  Copyright (C) 2019 ZiLu https://github.com/zhongzilu
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="10dp">
+
+    <Button
+        android:id="@+id/randomBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/border_random_btn"
+        android:foreground="?attr/selectableItemBackground"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:text="机选"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/allRedSelectBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/border_random_btn"
+        android:foreground="?attr/selectableItemBackground"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:text="全选"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toStartOf="@id/randomBtn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/allBlueSelectBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/border_random_btn"
+        android:foreground="?attr/selectableItemBackground"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:text="全选"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/redballRecycler" />
+
+    <TextView
+        android:id="@+id/redBallLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@id/randomBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/format_tools_red_ball_label" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/redballRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/randomBtn"
+        app:spanCount="7" />
+
+    <TextView
+        android:id="@+id/blueBallLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/redballRecycler"
+        tools:text="@string/format_tools_blue_ball_label" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/blueBallRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/blueBallLabel"
+        app:spanCount="7" />
+
+    <Button
+        android:id="@+id/nextBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:text="下一步"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+    <!--    <Button-->
+    <!--        android:id="@+id/nextBtn"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:background="@color/colorPrimary"-->
+    <!--        android:text="下一步"-->
+    <!--        android:textColor="@android:color/white"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent" />-->
+
+    <!--    <zilu.lottery.analysis.widget.ReleaseBallView2-->
+    <!--        android:id="@+id/selectedBallsView"-->
+    <!--        android:layout_width="0dp"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        android:background="@android:color/white"-->
+    <!--        android:gravity="center_vertical"-->
+    <!--        android:paddingStart="10dp"-->
+    <!--        android:paddingEnd="10dp"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toStartOf="@id/nextBtn"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="@id/nextBtn" />-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -78,6 +78,10 @@
             android:name=".activity.LotteryActivity"
             android:label="@string/activity_lottery_label" />
 
+        <activity
+            android:name=".activity.ToolsActivity"
+            android:label="@string/activity_lottery_label" />
+
         <provider
             android:name=".utils.ContextProvider"
             android:authorities="${applicationId}.ContextProvider"

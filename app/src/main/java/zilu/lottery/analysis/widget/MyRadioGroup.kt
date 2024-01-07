@@ -27,49 +27,37 @@
  *  limitations under the License.
  */
 
-package zilu.lottery.analysis
+package zilu.lottery.analysis.widget
 
-import android.app.Application
 import android.content.Context
-import android.content.Intent
-import com.google.gson.Gson
-import org.jetbrains.anko.doAsync
+import android.util.AttributeSet
+import android.view.View
+import android.widget.RadioGroup
+import zilu.lottery.analysis.R
 
 /**
  *
- * Create by zilu 2023/08/10
+ * Create by zilu 2024/01/07
  */
-class App : Application() {
+class MyRadioGroup : RadioGroup {
 
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-        if (!BuildConfig.DEBUG) startService(Intent(base, UpdateDataService::class.java))
+    constructor(context: Context) : this(context, null)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        val a = context.obtainStyledAttributes(attrs, R.styleable.MyRadioGroup)
+        val enable = a.getBoolean(R.styleable.MyRadioGroup_android_enabled, true)
+        isEnabled = enable
+        a.recycle()
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        deleteOldApk()
-    }
-
-    private fun deleteOldApk() {
-        doAsync {
-            getExternalFilesDir("")?.listFiles { file ->
-                file.name.endsWith(".apk")
-            }?.forEach { it.delete() }
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        for (i in 0 until childCount) {
+            getChildAt(i).isEnabled = enabled
         }
     }
+
+    override fun onViewAdded(child: View?) {
+        child?.isEnabled = isEnabled
+        super.onViewAdded(child)
+    }
 }
-
-val gson: Gson by lazy { Gson() }
-
-//fun View.visible() {
-//    visibility = View.VISIBLE
-//}
-//
-//fun View.gone() {
-//    visibility = View.GONE
-//}
-//
-//fun View.invisible() {
-//    visibility = View.INVISIBLE
-//}

@@ -47,6 +47,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import zilu.lottery.analysis.R
 import zilu.lottery.analysis.activity.LotteryActivity
+import zilu.lottery.analysis.activity.ToolsActivity
 import zilu.lottery.analysis.adapter.RVItemClickListener
 import zilu.lottery.analysis.adapter.ReleaseRecyclerAdapter
 import zilu.lottery.analysis.bean.ReleaseItem
@@ -55,6 +56,7 @@ import zilu.lottery.analysis.data.PLSTable
 import zilu.lottery.analysis.data.PLWTable
 import zilu.lottery.analysis.data.SSQTable
 import zilu.lottery.analysis.ui.BaseFragment
+import zilu.lottery.annotation.LotteryTypeDef
 import java.text.NumberFormat
 import java.util.*
 
@@ -114,7 +116,7 @@ class ReleaseFragment : BaseFragment(), RVItemClickListener<ReleaseRecyclerAdapt
                         "每周一、三、六 21:25开奖",
                         "第${id}期 $date",
                         buildSpannableString(format, 4),
-                        balls
+                        balls, LotteryTypeDef.DLT
                     )
                 )
             }
@@ -132,7 +134,7 @@ class ReleaseFragment : BaseFragment(), RVItemClickListener<ReleaseRecyclerAdapt
                         "每周二、四、日 21:15开奖",
                         "第${id}期 $date",
                         buildSpannableString(format, 4),
-                        balls
+                        balls, LotteryTypeDef.SSQ
                     )
                 )
             }
@@ -150,7 +152,7 @@ class ReleaseFragment : BaseFragment(), RVItemClickListener<ReleaseRecyclerAdapt
                         "每日 21:25开奖",
                         "第${id}期 $date",
                         buildSpannableString(format, 4),
-                        balls
+                        balls, LotteryTypeDef.PLS
                     )
                 )
             }
@@ -168,7 +170,7 @@ class ReleaseFragment : BaseFragment(), RVItemClickListener<ReleaseRecyclerAdapt
                         "每日 21:25开奖",
                         "第${id}期 $date",
                         buildSpannableString(format, 4),
-                        balls
+                        balls, LotteryTypeDef.PLW
                     )
                 )
             }
@@ -182,7 +184,10 @@ class ReleaseFragment : BaseFragment(), RVItemClickListener<ReleaseRecyclerAdapt
 
     override fun onItemClickListener(holder: ReleaseRecyclerAdapter.VH, v: View, position: Int) {
         when (v) {
-            holder.itemBtn1,
+            holder.itemBtn1 -> startActivity(
+                Intent(activity, ToolsActivity::class.java)
+                    .putExtra(ToolsActivity.EXTRA_TOOL_TAG, items[position].type)
+            )
             holder.itemBtn2 -> Unit
             else -> goDataAnalysis(mAdapter.getItemData(position).iconRes)
         }
@@ -195,7 +200,7 @@ class ReleaseFragment : BaseFragment(), RVItemClickListener<ReleaseRecyclerAdapt
 
     override fun onRefresh() {
         refreshData {
-            toast("刷新成功")
+            toast(getString(R.string.toast_refresh_complete))
             mRefresh.isRefreshing = false
         }
     }
