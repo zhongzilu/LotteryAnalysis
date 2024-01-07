@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~
+  ~        ___                       ___       ___
+  ~       /\  \          ___        /\__\     /\__\
+  ~       \:\  \        /\  \      /:/  /    /:/  /
+  ~        \:\  \       \:\  \    /:/  /    /:/  /
+  ~         \:\  \      /::\__\  /:/  /    /:/  /  ___
+  ~   _______\:\__\  __/:/\/__/ /:/__/    /:/__/  /\__\
+  ~   \::::::::/__/ /\/:/  /    \:\  \    \:\  \ /:/  /
+  ~    \:\~~\~~     \::/__/      \:\  \    \:\  /:/  /
+  ~     \:\  \       \:\__\       \:\  \    \:\/:/  /
+  ~      \:\__\       \/__/        \:\__\    \::/  /
+  ~       \/__/                     \/__/     \/__/
+  ~
+  ~  Copyright (C) 2019 ZiLu https://github.com/zhongzilu
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:paddingTop="8dp">
+
+    <ImageView
+        android:id="@+id/iconArrowForward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_arrow_forward_ios_24" />
+
+    <TextView
+        android:id="@+id/redBallLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="红球："
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/selectedRedBallsText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:lineSpacingExtra="5dp"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/iconArrowForward"
+        app:layout_constraintStart_toEndOf="@id/redBallLabel"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35" />
+
+    <TextView
+        android:id="@+id/blueBallLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="蓝球："
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selectedRedBallsText" />
+
+    <TextView
+        android:id="@+id/selectedBlueBallsText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:lineSpacingExtra="5dp"
+        android:textColor="@color/blueBall"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/iconArrowForward"
+        app:layout_constraintStart_toEndOf="@id/redBallLabel"
+        app:layout_constraintTop_toBottomOf="@id/selectedRedBallsText"
+        tools:text="1 2 3 5" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1px"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/blueBallLabel" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

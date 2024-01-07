@@ -1,0 +1,221 @@
+/*
+ *
+ *        ___                       ___       ___
+ *       /\  \          ___        /\__\     /\__\
+ *       \:\  \        /\  \      /:/  /    /:/  /
+ *        \:\  \       \:\  \    /:/  /    /:/  /
+ *         \:\  \      /::\__\  /:/  /    /:/  /  ___
+ *   _______\:\__\  __/:/\/__/ /:/__/    /:/__/  /\__\
+ *   \::::::::/__/ /\/:/  /    \:\  \    \:\  \ /:/  /
+ *    \:\~~\~~     \::/__/      \:\  \    \:\  /:/  /
+ *     \:\  \       \:\__\       \:\  \    \:\/:/  /
+ *      \:\__\       \/__/        \:\__\    \::/  /
+ *       \/__/                     \/__/     \/__/
+ *
+ *  Copyright (C) 2019 ZiLu https://github.com/zhongzilu
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package zilu.lottery.analysis.ui.release
+
+import android.content.Intent
+import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import zilu.lottery.analysis.R
+import zilu.lottery.analysis.activity.LotteryActivity
+import zilu.lottery.analysis.activity.ToolsActivity
+import zilu.lottery.analysis.adapter.RVItemClickListener
+import zilu.lottery.analysis.adapter.ReleaseRecyclerAdapter
+import zilu.lottery.analysis.bean.ReleaseItem
+import zilu.lottery.analysis.data.LotteryTable
+import zilu.lottery.analysis.data.PLSTable
+import zilu.lottery.analysis.data.PLWTable
+import zilu.lottery.analysis.data.SSQTable
+import zilu.lottery.analysis.ui.BaseFragment
+import zilu.lottery.annotation.LotteryTypeDef
+import java.text.NumberFormat
+import java.util.*
+
+class ReleaseFragment : BaseFragment(), RVItemClickListener<ReleaseRecyclerAdapter.VH>,
+    SwipeRefreshLayout.OnRefreshListener {
+
+    private lateinit var mAdapter: ReleaseRecyclerAdapter
+    private lateinit var mRefresh: SwipeRefreshLayout
+    private val items = ArrayList<ReleaseItem>(5)
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val root = inflater.inflate(R.layout.fragment_release, container, false)
+        root.findViewById<TextView>(R.id.text_release).text = "全国开奖"
+        mRefresh = root.findViewById(R.id.releaseRefresh)
+        mRefresh.setOnRefreshListener(this)
+        mRefresh.setColorSchemeResources(R.color.colorPrimary, R.color.blueBall)
+        val releaseRecycler = root.findViewById<RecyclerView>(R.id.releaseRecycler)
+        initReleaseRecycler(releaseRecycler)
+        refreshData()
+        return root
+    }
+
+    private fun initReleaseRecycler(releaseRecycler: RecyclerView) {
+        releaseRecycler.setHasFixedSize(true)
+//        val items = MutableList(5) {
+//            ReleaseItem(
+//                R.mipmap.ic_lottery,
+//                "大乐透",
+//                "周二、四、日 21：15",
+//                "第0000000期 09-08(五)",
+//                "累计00.00亿",
+//                "01 02 03 04 32+09 ${it + 10}"
+//            )
+//        }
+        mAdapter = ReleaseRecyclerAdapter(items)
+            .setOnItemClickListener(this)
+        releaseRecycler.adapter = mAdapter
+    }
+
+    private fun refreshData(callback: (() -> Unit)? = null) {
+        doAsync {
+            items.clear()
+            LotteryTable.findLatest()?.run {
+                val jackpot = NumberFormat.getNumberInstance().parse(jackpot)!!.toLong()
+                val format = getString(
+                    R.string.format_release_jackpot,
+                    String.format("%.2f", jackpot / 100000000f)
+                )
+                items.add(
+                    ReleaseItem(
+                        R.mipmap.ic_lottery,
+                        "大乐透",
+                        "每周一、三、六 21:25开奖",
+                        "第${id}期 $date",
+                        buildSpannableString(format, 4),
+                        balls, LotteryTypeDef.DLT
+                    )
+                )
+            }
+
+            SSQTable.findLatest()?.run {
+                val jackpot = NumberFormat.getNumberInstance().parse(jackpot)!!.toLong()
+                val format = getString(
+                    R.string.format_release_jackpot,
+                    String.format("%.2f", jackpot / 100000000f)
+                )
+                items.add(
+                    ReleaseItem(
+                        R.mipmap.ic_ssq,
+                        "双色球",
+                        "每周二、四、日 21:15开奖",
+                        "第${id}期 $date",
+                        buildSpannableString(format, 4),
+                        balls, LotteryTypeDef.SSQ
+                    )
+                )
+            }
+
+            PLSTable.findLatest()?.run {
+                val saleAmount = NumberFormat.getNumberInstance().parse(saleAmount)!!.toLong()
+                val format = getString(
+                    R.string.format_release_sale_amount,
+                    String.format("%.2f", saleAmount / 100000000f)
+                )
+                items.add(
+                    ReleaseItem(
+                        R.mipmap.ic_rank3,
+                        "排列三",
+                        "每日 21:25开奖",
+                        "第${id}期 $date",
+                        buildSpannableString(format, 4),
+                        balls, LotteryTypeDef.PLS
+                    )
+                )
+            }
+
+            PLWTable.findLatest()?.run {
+                val saleAmount = NumberFormat.getNumberInstance().parse(saleAmount)!!.toLong()
+                val format = getString(
+                    R.string.format_release_sale_amount,
+                    String.format("%.2f", saleAmount / 100000000f)
+                )
+                items.add(
+                    ReleaseItem(
+                        R.mipmap.ic_rank5,
+                        "排列五",
+                        "每日 21:25开奖",
+                        "第${id}期 $date",
+                        buildSpannableString(format, 4),
+                        balls, LotteryTypeDef.PLW
+                    )
+                )
+            }
+
+            uiThread {
+                mAdapter.notifyDataSetChanged()
+                callback?.invoke()
+            }
+        }
+    }
+
+    override fun onItemClickListener(holder: ReleaseRecyclerAdapter.VH, v: View, position: Int) {
+        when (v) {
+            holder.itemBtn1 -> startActivity(
+                Intent(activity, ToolsActivity::class.java)
+                    .putExtra(ToolsActivity.EXTRA_TOOL_TAG, items[position].type)
+            )
+            holder.itemBtn2 -> Unit
+            else -> goDataAnalysis(mAdapter.getItemData(position).iconRes)
+        }
+    }
+
+    private fun goDataAnalysis(iconRes: Int) = when (iconRes) {
+        R.mipmap.ic_lottery -> startActivity(Intent(activity, LotteryActivity::class.java))
+        else -> Unit
+    }
+
+    override fun onRefresh() {
+        refreshData {
+            toast(getString(R.string.toast_refresh_complete))
+            mRefresh.isRefreshing = false
+        }
+    }
+
+    private fun toast(msg: String) {
+        val toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER, 0, 0)
+        toast.show()
+    }
+
+    private fun buildSpannableString(text: String, start: Int) =
+        SpannableStringBuilder(text).apply {
+            val color = ForegroundColorSpan(resources.getColor(R.color.colorPrimary))
+            val size = RelativeSizeSpan(1.5f)
+            setSpan(color, start, text.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+            setSpan(size, start, text.lastIndex, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+        }
+}
