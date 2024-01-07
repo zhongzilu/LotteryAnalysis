@@ -45,7 +45,7 @@ private class SQL(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null, DB
 
     companion object {
         const val DB_NAME = "data.db"
-        const val DB_VERSION = 11
+        const val DB_VERSION = 12
 
         @JvmStatic
         val instance: SQL by lazy { SQL(ApplicationContext.get()) }
@@ -87,7 +87,7 @@ private class SQL(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null, DB
             PLSTableDef.BALLS to TEXT,
             PLSTableDef.MISS to TEXT,
             PLSTableDef.RED_BALLS to TEXT,
-            PLSTableDef.JACKPOT to TEXT,
+            PLSTableDef.SALE_AMOUNT to TEXT,
             PLSTableDef.DATE to TEXT,
         )
         //排列五
@@ -97,9 +97,10 @@ private class SQL(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null, DB
             PLWTableDef.BALLS to TEXT,
             PLWTableDef.MISS to TEXT,
             PLWTableDef.RED_BALLS to TEXT,
-            PLWTableDef.JACKPOT to TEXT,
+            PLWTableDef.SALE_AMOUNT to TEXT,
             PLWTableDef.DATE to TEXT,
         )
+        //键值对
         db.createTable(
             MapTableDef.NAME, true,
             MapTableDef.ID to INTEGER + PRIMARY_KEY,
@@ -110,9 +111,9 @@ private class SQL(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null, DB
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.dropTable(LotteryTableDef.NAME, true)
-        db?.dropTable(MapTableDef.NAME, true)
-        db?.dropTable(SSQTableDef.NAME, true)
+//        db?.dropTable(LotteryTableDef.NAME, true)
+//        db?.dropTable(MapTableDef.NAME, true)
+//        db?.dropTable(SSQTableDef.NAME, true)
         db?.dropTable(PLSTableDef.NAME, true)
         db?.dropTable(PLWTableDef.NAME, true)
         onCreate(db)
@@ -415,6 +416,204 @@ object SSQTable {
     fun delete() {
         SQL.instance.use {
             delete(SSQTableDef.NAME)
+        }
+    }
+}
+
+/**
+ * 排列三数据库表对象，用于存储每期开奖记录
+ */
+object PLSTable {
+
+    @JvmStatic
+    fun save(list: List<PLS>) {
+        SQL.instance.use {
+            try {
+                beginTransaction()
+                list.forEach { pls ->
+                    val i = insert(
+                        PLSTableDef.NAME,
+                        PLSTableDef.ID to pls.id,
+                        PLSTableDef.BALLS to pls.balls,
+                        PLSTableDef.MISS to pls.miss.joinToString(","),
+                        PLSTableDef.RED_BALLS to pls.redBalls.joinToString(","),
+                        PLSTableDef.SALE_AMOUNT to pls.saleAmount,
+                        PLSTableDef.DATE to pls.date,
+                    )
+                    if (i == -1L) throw SQLException("Error inserting $pls")
+                }
+                setTransactionSuccessful()
+            } finally {
+                endTransaction()
+            }
+        }
+    }
+
+    private val rowParser =
+        rowParser { id: String, balls: String, miss: String, rballs: String, amount: String, date: String ->
+            val missArray = emptyList<Int>()//miss.split(",").map { it.toInt() }
+            val rBalls = rballs.split(",").map { it.toInt() }
+            PLS(id, balls, missArray, rBalls, amount, date)
+        }
+
+    /**
+     * 获取所有的排列三记录
+     * @return List<PLS>
+     */
+    @JvmStatic
+    fun findAll(): List<PLS> = SQL.instance.use {
+        select(PLSTableDef.NAME).parseList(rowParser)
+    }
+
+    /**
+     * 获取最新的排列三记录，也可能没有记录
+     */
+    @JvmStatic
+    fun findLatest(): PLS? = SQL.instance.use {
+        select(PLSTableDef.NAME)
+            .orderBy(PLSTableDef.ID, SqlOrderDirection.DESC)
+            .limit(1)
+            .parseOpt(rowParser)
+    }
+
+    @JvmStatic
+    fun findById(id: String): PLS = SQL.instance.use {
+        select(PLSTableDef.NAME)
+            .whereArgs("${PLSTableDef.ID} = {id}", "id" to id)
+            .parseSingle(rowParser)
+    }
+
+    /**
+     * 获取一定日期范围内的排列三记录
+     * @param date 日期格式字符串，格式为： YYYY-MM-dd
+     */
+    @JvmStatic
+    fun findByDate(date: String): List<PLS> = SQL.instance.use {
+        select(PLSTableDef.NAME)
+            .whereArgs("${PLSTableDef.DATE} LIKE {year}", "year" to "$date%")
+            .parseList(rowParser)
+    }
+
+    @JvmStatic
+    fun findByLimit(limit: Int): List<PLS> = SQL.instance.use {
+        if (limit == 0) return@use emptyList()
+        select(PLSTableDef.NAME)
+            .orderBy(PLSTableDef.ID, SqlOrderDirection.DESC)
+            .limit(limit)
+            .parseList(rowParser)
+    }
+
+    @JvmStatic
+    fun count(): Int = SQL.instance.use {
+        select(PLSTableDef.NAME, "COUNT(${PLSTableDef.ID})").parseSingle(IntParser)
+    }
+
+    /**
+     * 清除所有纪录
+     */
+    @JvmStatic
+    fun delete() {
+        SQL.instance.use {
+            delete(PLSTableDef.NAME)
+        }
+    }
+}
+
+/**
+ * 排列五数据库表对象，用于存储每期开奖记录
+ */
+object PLWTable {
+
+    @JvmStatic
+    fun save(list: List<PLW>) {
+        SQL.instance.use {
+            try {
+                beginTransaction()
+                list.forEach { plw ->
+                    val i = insert(
+                        PLWTableDef.NAME,
+                        PLWTableDef.ID to plw.id,
+                        PLWTableDef.BALLS to plw.balls,
+                        PLWTableDef.MISS to plw.miss.joinToString(","),
+                        PLWTableDef.RED_BALLS to plw.redBalls.joinToString(","),
+                        PLWTableDef.SALE_AMOUNT to plw.saleAmount,
+                        PLWTableDef.DATE to plw.date,
+                    )
+                    if (i == -1L) throw SQLException("Error inserting $plw")
+                }
+                setTransactionSuccessful()
+            } finally {
+                endTransaction()
+            }
+        }
+    }
+
+    private val rowParser =
+        rowParser { id: String, balls: String, miss: String, rballs: String, amount: String, date: String ->
+            val missArray = emptyList<Int>()//miss.split(",").map { it.toInt() }
+            val rBalls = rballs.split(",").map { it.toInt() }
+            PLW(id, balls, missArray, rBalls, amount, date)
+        }
+
+    /**
+     * 获取所有的排列五记录
+     * @return List<PLS>
+     */
+    @JvmStatic
+    fun findAll(): List<PLW> = SQL.instance.use {
+        select(PLWTableDef.NAME).parseList(rowParser)
+    }
+
+    /**
+     * 获取最新的排列五记录，也可能没有记录
+     */
+    @JvmStatic
+    fun findLatest(): PLW? = SQL.instance.use {
+        select(PLWTableDef.NAME)
+            .orderBy(PLWTableDef.ID, SqlOrderDirection.DESC)
+            .limit(1)
+            .parseOpt(rowParser)
+    }
+
+    @JvmStatic
+    fun findById(id: String): PLW = SQL.instance.use {
+        select(PLWTableDef.NAME)
+            .whereArgs("${PLWTableDef.ID} = {id}", "id" to id)
+            .parseSingle(rowParser)
+    }
+
+    /**
+     * 获取一定日期范围内的排列五记录
+     * @param date 日期格式字符串，格式为： YYYY-MM-dd
+     */
+    @JvmStatic
+    fun findByDate(date: String): List<PLW> = SQL.instance.use {
+        select(PLWTableDef.NAME)
+            .whereArgs("${PLWTableDef.DATE} LIKE {year}", "year" to "$date%")
+            .parseList(rowParser)
+    }
+
+    @JvmStatic
+    fun findByLimit(limit: Int): List<PLW> = SQL.instance.use {
+        if (limit == 0) return@use emptyList()
+        select(PLWTableDef.NAME)
+            .orderBy(PLWTableDef.ID, SqlOrderDirection.DESC)
+            .limit(limit)
+            .parseList(rowParser)
+    }
+
+    @JvmStatic
+    fun count(): Int = SQL.instance.use {
+        select(PLWTableDef.NAME, "COUNT(${PLWTableDef.ID})").parseSingle(IntParser)
+    }
+
+    /**
+     * 清除所有纪录
+     */
+    @JvmStatic
+    fun delete() {
+        SQL.instance.use {
+            delete(PLWTableDef.NAME)
         }
     }
 }

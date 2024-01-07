@@ -34,6 +34,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 
 /**
  *
@@ -47,6 +49,9 @@ abstract class BaseFragment : Fragment() {
     @JvmField
     protected var initData = true
 
+    @JvmField
+    protected val mainScope = MainScope()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,5 +59,10 @@ abstract class BaseFragment : Fragment() {
     ): View? {
         this.container = container
         return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onDestroy() {
+        mainScope.cancel()
+        super.onDestroy()
     }
 }

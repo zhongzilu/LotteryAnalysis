@@ -46,6 +46,7 @@ import zilu.lottery.analysis.data.MapTable
 import zilu.lottery.analysis.utils.SP
 import zilu.lottery.annotation.SPKey
 import java.io.IOException
+import java.net.Proxy
 
 /**
  *
@@ -67,7 +68,9 @@ class InitLotteryWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, pa
         try {
             val url = applicationContext.getString(R.string.lottery_history_url, "07001")
             document = Jsoup.connect(url)
+                .proxy(Proxy.NO_PROXY)
                 .userAgent(applicationContext.getString(R.string.user_agent))
+                .maxBodySize(0)
                 .get()
 
             log("> 加载数据完毕，正在解析数据……\n")

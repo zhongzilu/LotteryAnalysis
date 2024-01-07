@@ -33,20 +33,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/partitionRootContainer"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        app:layout_constraintBottom_toTopOf="@+id/tabs"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#DFDEDE"
-        app:layout_constraintTop_toBottomOf="@id/filterSpinner" />
-
     <zilu.lottery.analysis.widget.MyTabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
@@ -61,5 +47,18 @@
         app:tabRippleColor="@android:color/transparent"
         app:tabSelectMode="none"
         app:tabSelectedTextColor="@color/colorPrimary" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#DFDEDE" />
+
+    <FrameLayout
+        android:id="@+id/partitionRootContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:layout_constraintBottom_toTopOf="@+id/tabs"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </LinearLayout>

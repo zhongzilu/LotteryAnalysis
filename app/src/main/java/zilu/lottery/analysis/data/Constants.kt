@@ -50,4 +50,13 @@ object Constants {
      */
     const val blueBallColor: Int = 0xFF5F77FF.toInt() //Color.parseColor("#5F77FF")
 
+    /**
+     * 红球单元格背景颜色
+     */
+    const val redBallCellBgColor: Int = 0xFFFFF9F9.toInt()
+
+    /**
+     * 蓝球单元格背景颜色
+     */
+    const val blueBallCellBgColor: Int = 0xFFF9FAFF.toInt()
 }

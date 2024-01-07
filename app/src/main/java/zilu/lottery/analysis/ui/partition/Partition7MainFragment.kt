@@ -43,7 +43,9 @@ import com.bin.david.form.data.column.Column
 import com.bin.david.form.data.format.bg.ICellBackgroundFormat
 import com.bin.david.form.data.table.TableData
 import com.bin.david.form.utils.DensityUtils
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import zilu.lottery.analysis.R
 import zilu.lottery.analysis.bean.Lottery
 import zilu.lottery.analysis.data.Constants
@@ -115,6 +117,7 @@ class Partition7MainFragment(private val name: String) : BaseFragment(),
             .setMinTableWidth(displayMetrics.widthPixels)
             .isShowTableTitle = false
 
+        table.setZoom(true, 1f, .5f)
         table.setOnSmartTableInvalidateListener {
             initData = false
         }
@@ -135,77 +138,78 @@ class Partition7MainFragment(private val name: String) : BaseFragment(),
     }
 
     private fun buildTable(run: (() -> List<Lottery>)) {
-        doAsync {
+        mainScope.launch {
+            withContext(Dispatchers.IO) {
 
-            columnArray.clear()
-            val datas = run.invoke()
-            val dataLen = datas.size
+                columnArray.clear()
+                val datas = run.invoke()
+                val dataLen = datas.size
 
-            val qihaoColumn = Column<String>("期号", "")
-            qihaoColumn.datas = List(dataLen) { i -> datas[i].id }
-            qihaoColumn.isFixed = true
-            columnArray.add(qihaoColumn)
+                val qihaoColumn = Column<String>("期号", "")
+                qihaoColumn.datas = List(dataLen) { i -> datas[i].id }
+                qihaoColumn.isFixed = true
+                columnArray.add(qihaoColumn)
 
-            val ballsColumn = Column<String>("开奖号码", "")
-            ballsColumn.typeface = Typeface.MONOSPACE
-            ballsColumn.datas = List(dataLen) { i -> datas[i].balls }
-            columnArray.add(ballsColumn)
+                val ballsColumn = Column<String>("开奖号码", "")
+                ballsColumn.typeface = Typeface.MONOSPACE
+                ballsColumn.datas = List(dataLen) { i -> datas[i].balls }
+                columnArray.add(ballsColumn)
 
-            val partitionArray = ArrayList<Column<*>>(7)
-            repeat(7) { //5、7分区
-                val partitionXSequence = it.inc()
-                val column = Column<String>("${partitionXSequence}区", "")
+                val partitionArray = ArrayList<Column<*>>(7)
+                repeat(7) { //5、7分区
+                    val partitionXSequence = it.inc()
+                    val column = Column<String>("${partitionXSequence}区", "")
 //                column.countFormat = stringCountFormat
-                column.datas = List(dataLen) { i ->
-                    datas[i].redP.p7[it].toString()
+                    column.datas = List(dataLen) { i ->
+                        datas[i].redP.p7[it].toString()
+                    }
+                    partitionArray.add(column)
                 }
-                partitionArray.add(column)
-            }
 
-            val partitionParentColumn = Column<String>("前区七分区", partitionArray)
-            columnArray.add(partitionParentColumn)
+                val partitionParentColumn = Column<String>("前区七分区", partitionArray)
+                columnArray.add(partitionParentColumn)
 
-            //出号区的个数
-            val partitionType = Column<String>("区形态", "")
+                //出号区的个数
+                val partitionType = Column<String>("区形态", "")
 //            partitionType.countFormat = stringCountFormat
-            partitionType.datas = List(dataLen) { datas[it].redP.p7t }
-            columnArray.add(partitionType)
+                partitionType.datas = List(dataLen) { datas[it].redP.p7t }
+                columnArray.add(partitionType)
 
-            val oddColumn1 = Column<Int>("奇数区", "")
-            oddColumn1.countFormat = intCountFormat
-            oddColumn1.datas = List(dataLen) {
-                arrayOf(1, 3, 5, 7).count { i -> datas[it].redP.p7[i - 1] > 0 }
-            }
-            val evenColumn1 = Column<Int>("偶数区", "")
-            evenColumn1.countFormat = intCountFormat
-            evenColumn1.datas = List(dataLen) {
-                arrayOf(2, 4, 6).count { i -> datas[it].redP.p7[i - 1] > 0 }
-            }
-            val fromParentColumn = Column<Int>("出号区的个数", oddColumn1, evenColumn1)
-            columnArray.add(fromParentColumn)
+                val oddColumn1 = Column<Int>("奇数区", "")
+                oddColumn1.countFormat = intCountFormat
+                oddColumn1.datas = List(dataLen) {
+                    arrayOf(1, 3, 5, 7).count { i -> datas[it].redP.p7[i - 1] > 0 }
+                }
+                val evenColumn1 = Column<Int>("偶数区", "")
+                evenColumn1.countFormat = intCountFormat
+                evenColumn1.datas = List(dataLen) {
+                    arrayOf(2, 4, 6).count { i -> datas[it].redP.p7[i - 1] > 0 }
+                }
+                val fromParentColumn = Column<Int>("出号区的个数", oddColumn1, evenColumn1)
+                columnArray.add(fromParentColumn)
 
-            //出2个号的区个数
-            val oddColumn2 = Column<Int>("奇数区", "")
-            oddColumn2.countFormat = intCountFormat
-            oddColumn2.datas = List(dataLen) {
-                arrayOf(1, 3, 5, 7).count { i -> datas[it].redP.p7[i - 1] == 2 }
-            }
-            val evenColumn2 = Column<Int>("偶数区", "")
-            evenColumn2.countFormat = intCountFormat
-            evenColumn2.datas = List(dataLen) {
-                arrayOf(2, 4, 6).count { i -> datas[it].redP.p7[i - 1] == 2 }
-            }
-            val doubleParentColumn = Column<Int>("出2个号的区个数", oddColumn2, evenColumn2)
-            columnArray.add(doubleParentColumn)
+                //出2个号的区个数
+                val oddColumn2 = Column<Int>("奇数区", "")
+                oddColumn2.countFormat = intCountFormat
+                oddColumn2.datas = List(dataLen) {
+                    arrayOf(1, 3, 5, 7).count { i -> datas[it].redP.p7[i - 1] == 2 }
+                }
+                val evenColumn2 = Column<Int>("偶数区", "")
+                evenColumn2.countFormat = intCountFormat
+                evenColumn2.datas = List(dataLen) {
+                    arrayOf(2, 4, 6).count { i -> datas[it].redP.p7[i - 1] == 2 }
+                }
+                val doubleParentColumn = Column<Int>("出2个号的区个数", oddColumn2, evenColumn2)
+                columnArray.add(doubleParentColumn)
 
 //            columnArray.forEach { it.isFast = true }
 
-            //表格数据 datas是需要填充的数据
-            val tableData = TableData(name, datas, columnArray)
-            table.tableData = tableData
+                //表格数据 datas是需要填充的数据
+                val tableData = TableData(name, datas, columnArray)
+                table.tableData = tableData
+            }
         }
     }
-
 
     override fun onIssuesItemSelected(parent: AdapterView<*>, position: Int) {
         val num = when (position) {

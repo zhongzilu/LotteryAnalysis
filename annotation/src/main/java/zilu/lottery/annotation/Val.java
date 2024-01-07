@@ -51,6 +51,16 @@ public @interface Val {
     int DLT_BLUE_BALL_SIZE = 12;
 
     /**
+     * 大乐透开奖号的红球个数
+     */
+    int DLT_RED_BALL_LIMIT = 5;
+
+    /**
+     * 大乐透开奖号的蓝球个数
+     */
+    int DLT_BLUE_BALL_LIMIT = 2;
+
+    /**
      * 双色球号总个数(红球1-33，篮球1-16)
      */
     int SSQ_BALL_SIZE = 49;
@@ -64,6 +74,20 @@ public @interface Val {
      * 双色球蓝球的数量
      */
     int SSQ_BLUE_BALL_SIZE = 16;
+
+    /**
+     * 排列三号码总个数（分为：百位、十位，个位，每位号码范围为0～9）
+     * Example:
+     * <p>
+     * 开奖号码为518（百位是5，十位是1，个位是8）
+     * </p>
+     */
+    int PLS_BALL_SIZE = 10;
+
+    /**
+     * 排列三红球数量
+     */
+    int PLS_RED_BALL_SIZE = 3;
 
     /**
      * 默认查询条数

@@ -105,7 +105,7 @@ class ReleaseItem {
 
     /**奖池: 累计00.00亿*/
     @JvmField
-    val jackpot: String
+    val jackpot: CharSequence
 
     /**开奖号码: 01 02 03 04 11+09 08*/
     @JvmField
@@ -118,7 +118,7 @@ class ReleaseItem {
         title: String,
         date: String,
         qihao: String,
-        jackpot: String,
+        jackpot: CharSequence,
         balls: String
     ) {
         this.iconRes = iconRes

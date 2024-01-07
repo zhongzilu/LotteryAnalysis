@@ -37,13 +37,14 @@ ext.buildInfo = [
         versionCode       : android.defaultConfig.versionCode,
         updatePath        : 'update',
         updateBaseUrl     : 'https://raw.githubusercontent.com/zhongzilu/LotteryAnalysis/master/update/',
-//        updateBaseUrl     : 'https://raw.githubusercontent.com/SirLYC/EveryDownload/master/update/',
         updateInfoFilename: 'updateInfo.json',
         versionDes        : "1.[优化]检查并删除旧安装包,避免占用空间;\n2.修复统计算法出现的数据不一致问题;\n3.更新数据的存储方式;",
+        updateProxy       : 'https://mirror.ghproxy.com/'
 ]
 
 android.buildTypes.all { buildType ->
-    buildType.buildConfigField("String", "RAW_URL", "\"https://ghproxy.com/${buildInfo.updateBaseUrl}${buildInfo.updateInfoFilename}\"")
+    buildType.buildConfigField("String", "RAW_URL", "\"${buildInfo.updateBaseUrl}${buildInfo.updateInfoFilename}\"")
+    buildType.buildConfigField("String", "UPDATE_PROXY", "\"${buildInfo.updateProxy}\"")
 //        buildType.buildConfigField("String", "APK_NAME", "\"${"app-${buildType.name}-${buildInfo.versionName}.apk"}\"")
 //        buildType.buildConfigField("String", "INFO_FILE_NAME", "\"${buildInfo.updateInfoFilename}\"")
 }

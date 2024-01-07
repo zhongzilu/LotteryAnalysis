@@ -31,34 +31,30 @@ package zilu.lottery.analysis.activity
 
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.NestedScrollView
+import kotlinx.coroutines.*
 import org.jetbrains.anko.collections.forEachReversedByIndex
 import org.jetbrains.anko.collections.forEachWithIndex
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.uiThread
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import zilu.lottery.analysis.R
-import zilu.lottery.analysis.bean.Lottery
-import zilu.lottery.analysis.bean.MapKV
-import zilu.lottery.analysis.bean.SSQ
-import zilu.lottery.analysis.data.LotteryTable
-import zilu.lottery.analysis.data.MapTable
-import zilu.lottery.analysis.data.SSQTable
+import zilu.lottery.analysis.bean.*
+import zilu.lottery.analysis.data.*
 import zilu.lottery.analysis.utils.SP
 import zilu.lottery.annotation.SPKey
 import java.io.IOException
+import java.net.Proxy
 
 class SplashActivity : AppCompatActivity() {
 
     private lateinit var logText: TextView
     private lateinit var nestedScrollView: NestedScrollView
     private lateinit var nextBtn: View
+    private val mainScope = MainScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,300 +79,398 @@ class SplashActivity : AppCompatActivity() {
         start()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        mainScope.cancel()
+    }
+
     private fun start() {
         log("> 正在执行数据初始化……\n")
 
-//        val constraints = Constraints.Builder()
-//            .setRequiredNetworkType(NetworkType.CONNECTED)
-//            .build()
-//
-//        val initLotteryWorkRequest =
-//            OneTimeWorkRequest.Builder(InitLotteryWorker::class.java)
-//                .setConstraints(constraints)
-//                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-//                .build()
-//
-//        val workManager = WorkManager.getInstance(this)
-//        workManager.getWorkInfoByIdLiveData(initLotteryWorkRequest.id)
-//            .observe(this, ::progressObserver)
-//        workManager.beginWith(initLotteryWorkRequest)
-//            .enqueue()
-
-        initLotteryDataTask()
-
-//        MainScope().launch {
-//            val res = withContext(Dispatchers.IO) {
-//            }
-//        }
-//        CoroutineScope(Dispatchers.IO).launch {
-//
-//        }
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            log("> 加载数据异常，请重启应用！\n")
+            throwable.printStackTrace()
+        }
+        mainScope.launch(exceptionHandler) {
+            initLotteryDataTask()
+            initSSQDataTask()
+            initPLSDataTask()
+            initPLWDataTask()
+            SP.remove(SPKey.UPDATE)
+            SP.isInit = false
+            nextBtn.visibility = View.VISIBLE
+        }
     }
 
-    private fun initLotteryDataTask() {
-        log("============================\n")
-        log("> 开始初始化大乐透数据\n> 检查本地数据……\n")
+    private suspend fun initLotteryDataTask() = withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Main) {
+            log("============================\n")
+            log("> 开始初始化大乐透数据\n> 检查本地数据……\n")
+        }
 
-        doAsync {
-
-            val size = LotteryTable.count()
-            if (size > 0) {
-                uiThread {
-                    log("> 已存在 $size 条数据，不需要进行初始化……\n")
-//                    nextBtn.visibility = View.VISIBLE
-                }
-                initSSQDataTask()
-                return@doAsync
+        val size = LotteryTable.count()
+        if (size > 0) {
+            withContext(Dispatchers.Main) {
+                log("> 已存在 $size 条数据，不需要进行初始化……\n")
             }
+            return@withContext
+        }
 
-            uiThread {
-                log("> 本地存在 $size 条数据\n> 开始加载网络数据……\n")
+        withContext(Dispatchers.Main) {
+            log("> 本地存在 $size 条数据\n> 开始加载网络数据……\n")
+        }
+
+        val document: Document
+        try {
+            val url = getString(R.string.lottery_history_url, "07001")
+            document = Jsoup.connect(url)
+                .proxy(Proxy.NO_PROXY)
+                .userAgent(getString(R.string.user_agent))
+                .maxBodySize(0)
+                .get()
+
+            withContext(Dispatchers.Main) {
+                log("> 加载数据完毕，正在解析数据……\n")
             }
+        } catch (e: IOException) {
+            throw IOException("加载数据异常，请重启应用！", e)
+        }
 
-            val document: Document
-            try {
-                val url = getString(R.string.lottery_history_url, "07001")
-                document = Jsoup.connect(url)
-                    .userAgent(getString(R.string.user_agent))
-                    .get()
+        val lotteries: ArrayList<Lottery>
+        try {
+            val elements = document.select("#tdata > .t_tr1")
 
-                uiThread {
-                    log("> 加载数据完毕，正在解析数据……\n")
-                }
-            } catch (e: IOException) {
-                uiThread {
-                    log("> 加载数据异常，请重启应用！\n")
-                }
-                return@doAsync
-            }
+            var upper: Lottery? = null
+            lotteries = ArrayList(elements.size)
+            elements.forEachReversedByIndex {
+                val id = it.child(0).text()
+                val r1 = it.child(1).text()
+                val r2 = it.child(2).text()
+                val r3 = it.child(3).text()
+                val r4 = it.child(4).text()
+                val r5 = it.child(5).text()
+                val b1 = it.child(6).text()
+                val b2 = it.child(7).text()
+                val jackpot = it.child(8).text()
+                val date = it.child(14).text()
 
-            val lotteries: ArrayList<Lottery>
-            try {
-                val elements = document.select("#tdata > .t_tr1")
-
-                var upper: Lottery? = null
-                lotteries = ArrayList(elements.size)
-                elements.forEachReversedByIndex {
-                    val id = it.child(0).text()
-                    val r1 = it.child(1).text()
-                    val r2 = it.child(2).text()
-                    val r3 = it.child(3).text()
-                    val r4 = it.child(4).text()
-                    val r5 = it.child(5).text()
-                    val b1 = it.child(6).text()
-                    val b2 = it.child(7).text()
-                    val jackpot = it.child(8).text()
-                    val date = it.child(14).text()
-
-                    val balls = "$r1 $r2 $r3 $r4 $r5+$b1 $b2"
-                    val lottery = Lottery(id, balls, date, jackpot)
-                    if (upper != null) {
-                        lottery.miss.forEachWithIndex { i, loss ->
-                            if (loss == 1) lottery.miss[i] = upper!!.miss[i] + 1
-                        }
+                val balls = "$r1 $r2 $r3 $r4 $r5+$b1 $b2"
+                val lottery = Lottery(id, balls, date, jackpot)
+                if (upper != null) {
+                    lottery.miss.forEachWithIndex { i, loss ->
+                        if (loss == 1) lottery.miss[i] = upper!!.miss[i] + 1
                     }
-
-                    upper = lottery
-                    lotteries.add(lottery)
                 }
 
-                uiThread {
-                    log("> 解析数据完毕，正在保存数据……\n")
-                }
-            } catch (e: Throwable) {
-                uiThread {
-                    log("> 解析数据异常，请重启应用！\n")
-                }
-                return@doAsync
+                upper = lottery
+                lotteries.add(lottery)
             }
 
-            //save to SQLite database
-            try {
-                LotteryTable.save(lotteries)
+            withContext(Dispatchers.Main) {
+                log("> 解析数据完毕，正在保存数据……\n")
+            }
+        } catch (e: Throwable) {
+            throw RuntimeException("解析数据异常，请重启应用！", e)
+        }
 
-                val map = HashMap<String, Int>()
-//                val yearMap = HashMap<String, Int>()
-//                val total = lotteries.size
+        //save to SQLite database
+        try {
+            LotteryTable.save(lotteries)
 
-                //统计红球5分区历史数据
-                lotteries.forEach { lo ->
-                    val t = lo.redP.p5t
-                    val count = map[t]
-                    map[t] = if (count != null) count + 1 else 1
-                }
-                //保存红球5分区历史数据
-                map.forEach { e ->
-                    val mapKV =
-                        MapKV(0, "rp5t.${e.key}", "${e.value}", System.currentTimeMillis())
-                    MapTable.save(mapKV)
-                }
+            val map = HashMap<String, Int>()
 
-                //按年统计红球5分区类型
-                map.clear()
-                lotteries.forEach { lo ->
-                    val y = lo.date.substring(0, 4)
-                    val t = "$y.${lo.redP.p5t}"
-                    val count = map[t]
-                    map[t] = if (count != null) count + 1 else 1
+            //统计红球5分区历史数据
+            lotteries.forEach { lo ->
+                val t = lo.redP.p5t
+                val count = map[t]
+                map[t] = if (count != null) count + 1 else 1
+            }
+            //保存红球5分区历史数据
+            map.forEach { e ->
+                val mapKV =
+                    MapKV(0, "rp5t.${e.key}", "${e.value}", System.currentTimeMillis())
+                MapTable.save(mapKV)
+            }
+
+            //按年统计红球5分区类型
+            map.clear()
+            lotteries.forEach { lo ->
+                val y = lo.date.substring(0, 4)
+                val t = "$y.${lo.redP.p5t}"
+                val count = map[t]
+                map[t] = if (count != null) count + 1 else 1
 
 //                    val year = yearMap[y]
 //                    yearMap[y] = if (year != null) year + 1 else 1
-                }
-                map.forEach { e ->
-                    val mapKV =
-                        MapKV(0, "rp5t.${e.key}", "${e.value}", System.currentTimeMillis())
-                    MapTable.save(mapKV)
-                }
+            }
+            map.forEach { e ->
+                val mapKV =
+                    MapKV(0, "rp5t.${e.key}", "${e.value}", System.currentTimeMillis())
+                MapTable.save(mapKV)
+            }
 
-                //统计红球7分区历史统计
-                map.clear()
-                lotteries.forEach { lo ->
-                    val t = lo.redP.p7t
-                    val count = map[t]
-                    map[t] = if (count != null) count + 1 else 1
-                }
-                //保存红球7分区历史统计
-                map.forEach { e ->
-                    val mapKV =
-                        MapKV(0, "rp7t.${e.key}", "${e.value}", System.currentTimeMillis())
-                    MapTable.save(mapKV)
-                }
+            //统计红球7分区历史统计
+            map.clear()
+            lotteries.forEach { lo ->
+                val t = lo.redP.p7t
+                val count = map[t]
+                map[t] = if (count != null) count + 1 else 1
+            }
+            //保存红球7分区历史统计
+            map.forEach { e ->
+                val mapKV =
+                    MapKV(0, "rp7t.${e.key}", "${e.value}", System.currentTimeMillis())
+                MapTable.save(mapKV)
+            }
 
-                //按年统计红球7分区类型
-                map.clear()
-                lotteries.forEach { lo ->
-                    val y = lo.date.substring(0, 4)
-                    val t = "$y.${lo.redP.p7t}"
-                    val count = map[t]
-                    map[t] = if (count != null) count + 1 else 1
-                }
-                map.forEach { e ->
-                    val mapKV =
-                        MapKV(0, "rp7t.${e.key}", "${e.value}", System.currentTimeMillis())
-                    MapTable.save(mapKV)
-                }
+            //按年统计红球7分区类型
+            map.clear()
+            lotteries.forEach { lo ->
+                val y = lo.date.substring(0, 4)
+                val t = "$y.${lo.redP.p7t}"
+                val count = map[t]
+                map[t] = if (count != null) count + 1 else 1
+            }
+            map.forEach { e ->
+                val mapKV =
+                    MapKV(0, "rp7t.${e.key}", "${e.value}", System.currentTimeMillis())
+                MapTable.save(mapKV)
+            }
 
 //                yearMap.clear()
-                map.clear()
+            map.clear()
 
-                uiThread {
-                    log("> 保存数据完毕, 共保存 ${lotteries.size} 条数据\n")
+            withContext(Dispatchers.Main) {
+                log("> 保存数据完毕, 共保存 ${lotteries.size} 条数据\n")
 //                    nextBtn.visibility = View.VISIBLE
-                }
-
-                initSSQDataTask()
-
-            } catch (e: Throwable) {
-                uiThread {
-                    log("> 保存数据异常: \n ${Log.getStackTraceString(e)}\n")
-                    log("> 请重启应用！\n")
-                }
             }
+
+//            initSSQDataTask()
+
+        } catch (e: Throwable) {
+            throw RuntimeException("保存数据异常", e)
         }
     }
 
-    private fun initSSQDataTask() {
+    private suspend fun initSSQDataTask() = withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Main) {
+            log("============================\n")
+            log("> 开始初始化双色球数据\n> 检查本地数据……\n")
+        }
 
-        doAsync {
-            uiThread {
-                log("============================\n")
-                log("> 开始初始化双色球数据\n> 检查本地数据……\n")
+        val size = SSQTable.count()
+        if (size > 0) {
+            withContext(Dispatchers.Main) {
+                log("> 已存在 $size 条数据，不需要进行初始化……\n")
             }
+            return@withContext
+        }
 
-            val size = SSQTable.count()
-            if (size > 0) {
-                uiThread {
-                    log("> 已存在 $size 条数据，不需要进行初始化……\n")
-                    nextBtn.visibility = View.VISIBLE
-                }
-                return@doAsync
+        withContext(Dispatchers.Main) {
+            log("> 本地存在 $size 条数据\n> 开始加载网络数据……\n")
+        }
+
+        val document: Document
+        try {
+            val url = getString(R.string.ssq_history_url, "03001")
+            document = Jsoup.connect(url)
+                .proxy(Proxy.NO_PROXY)
+                .userAgent(getString(R.string.user_agent))
+                .maxBodySize(0)
+                .get()
+
+            withContext(Dispatchers.Main) {
+                log("> 加载数据完毕，正在解析数据……\n")
             }
+        } catch (e: IOException) {
+            throw IOException("加载数据异常，请重启应用！", e)
+        }
 
-            uiThread {
-                log("> 本地存在 $size 条数据\n> 开始加载网络数据……\n")
-            }
+        val ssqList: ArrayList<SSQ>
+        try {
+            val elements = document.select("#tdata > .t_tr1")
 
-            val document: Document
-            try {
-                val url = getString(R.string.ssq_history_url, "03001")
-                document = Jsoup.connect(url)
-                    .userAgent(getString(R.string.user_agent))
-                    .get()
+            var upper: SSQ? = null
+            ssqList = ArrayList(elements.size)
+            elements.forEachReversedByIndex {
+                val id = it.child(0).text()
+                val r1 = it.child(1).text()
+                val r2 = it.child(2).text()
+                val r3 = it.child(3).text()
+                val r4 = it.child(4).text()
+                val r5 = it.child(5).text()
+                val r6 = it.child(6).text()
+                val b1 = it.child(7).text()
+                val jackpot = it.child(9).text()
+                val date = it.child(15).text()
 
-                uiThread {
-                    log("> 加载数据完毕，正在解析数据……\n")
-                }
-            } catch (e: IOException) {
-                uiThread {
-                    log("> 加载数据异常，请重启应用！\n")
-                }
-                return@doAsync
-            }
-
-            val ssqList: ArrayList<SSQ>
-            try {
-                val elements = document.select("#tdata > .t_tr1")
-
-                var upper: SSQ? = null
-                ssqList = ArrayList(elements.size)
-                elements.forEachReversedByIndex {
-                    val id = it.child(0).text()
-                    val r1 = it.child(1).text()
-                    val r2 = it.child(2).text()
-                    val r3 = it.child(3).text()
-                    val r4 = it.child(4).text()
-                    val r5 = it.child(5).text()
-                    val r6 = it.child(6).text()
-                    val b1 = it.child(7).text()
-                    val jackpot = it.child(9).text()
-                    val date = it.child(15).text()
-
-                    val balls = "$r1 $r2 $r3 $r4 $r5 $r6+$b1"
-                    val ssq = SSQ(id, balls, date, jackpot)
-                    if (upper != null) {
-                        ssq.miss.forEachWithIndex { i, loss ->
-                            if (loss == 1) ssq.miss[i] = upper!!.miss[i] + 1
-                        }
+                val balls = "$r1 $r2 $r3 $r4 $r5 $r6+$b1"
+                val ssq = SSQ(id, balls, date, jackpot)
+                if (upper != null) {
+                    ssq.miss.forEachWithIndex { i, loss ->
+                        if (loss == 1) ssq.miss[i] = upper!!.miss[i] + 1
                     }
-
-                    upper = ssq
-                    ssqList.add(ssq)
                 }
 
-                uiThread {
-                    log("> 解析数据完毕，正在保存数据……\n")
-                }
-            } catch (e: Throwable) {
-                uiThread {
-                    log("> 解析数据异常，请重启应用！\n")
-                }
-                return@doAsync
+                upper = ssq
+                ssqList.add(ssq)
             }
 
-            //save to SQLite database
-            try {
-                SSQTable.save(ssqList)
-                SP.remove(SPKey.UPDATE)
-                SP.isInit = false
-                uiThread {
-                    log("> 保存数据完毕, 共保存 ${ssqList.size} 条数据\n")
-                    nextBtn.visibility = View.VISIBLE
-                }
-
-            } catch (e: Throwable) {
-                uiThread {
-                    log("> 保存数据异常: \n ${Log.getStackTraceString(e)}\n")
-                }
+            withContext(Dispatchers.Main) {
+                log("> 解析数据完毕，正在保存数据……\n")
             }
+        } catch (e: Throwable) {
+            throw RuntimeException("解析数据异常，请重启应用！", e)
+        }
+
+        //save to SQLite database
+        try {
+            SSQTable.save(ssqList)
+            withContext(Dispatchers.Main) {
+                log("> 保存数据完毕, 共保存 ${ssqList.size} 条数据\n")
+            }
+
+        } catch (e: Throwable) {
+            throw RuntimeException("保存数据异常", e)
         }
     }
 
-//    private fun progressObserver(workInfo: WorkInfo?) {
-//        val data = workInfo?.progress ?: return
-//        val log = data.getString("log")
-//        if (!TextUtils.isEmpty(log))
-//            logText.append(log)
-//    }
+    private suspend fun initPLSDataTask() = withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Main) {
+            log("============================\n")
+            log("> 开始初始化排列3数据\n> 检查本地数据……\n")
+        }
+
+        val size = PLSTable.count()
+        if (size > 0) {
+            withContext(Dispatchers.Main) {
+                log("> 已存在 $size 条数据，不需要进行初始化……\n")
+            }
+            return@withContext
+        }
+
+        withContext(Dispatchers.Main) {
+            log("> 本地存在 $size 条数据\n> 开始加载网络数据……\n")
+        }
+
+        val document: Document
+        try {
+            val url = getString(R.string.pls_history_url, -1, "04001")
+            document = Jsoup.connect(url)
+                .proxy(Proxy.NO_PROXY)
+                .userAgent(getString(R.string.user_agent))
+                .maxBodySize(0)
+                .get()
+
+            withContext(Dispatchers.Main) {
+                log("> 加载数据完毕，正在解析数据……\n")
+            }
+        } catch (e: IOException) {
+            throw IOException("加载数据异常，请重启应用！", e)
+        }
+
+        val plsList: ArrayList<PLS>
+        try {
+            val elements = document.select("#tablelist tr.t_tr1")
+
+            plsList = ArrayList(elements.size)
+            elements.forEachReversedByIndex {
+                val id = it.child(0).text()
+                val balls = it.child(1).text()
+                val saleAmount = it.child(3).text()
+                val date = it.child(10).text()
+
+                val pls = PLS(id, balls, date, saleAmount)
+                plsList.add(pls)
+            }
+
+            withContext(Dispatchers.Main) {
+                log("> 解析数据完毕，正在保存数据……\n")
+            }
+        } catch (e: Throwable) {
+            throw RuntimeException("解析数据异常，请重启应用！", e)
+        }
+
+        //save to SQLite database
+        try {
+            PLSTable.save(plsList)
+            withContext(Dispatchers.Main) {
+                log("> 保存数据完毕, 共保存 ${plsList.size} 条数据\n")
+            }
+
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            throw RuntimeException("保存数据异常", e)
+        }
+    }
+
+    private suspend fun initPLWDataTask() = withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Main) {
+            log("============================\n")
+            log("> 开始初始化排列5数据\n> 检查本地数据……\n")
+        }
+
+        val size = PLWTable.count()
+        if (size > 0) {
+            withContext(Dispatchers.Main) {
+                log("> 已存在 $size 条数据，不需要进行初始化……\n")
+            }
+            return@withContext
+        }
+
+        withContext(Dispatchers.Main) {
+            log("> 本地存在 $size 条数据\n> 开始加载网络数据……\n")
+        }
+
+        val document: Document
+        try {
+            val url = getString(R.string.plw_history_url, -1, "04001")
+            document = Jsoup.connect(url)
+                .proxy(Proxy.NO_PROXY)
+                .userAgent(getString(R.string.user_agent))
+                .maxBodySize(0)
+                .get()
+
+            withContext(Dispatchers.Main) {
+                log("> 加载数据完毕，正在解析数据……\n")
+            }
+        } catch (e: IOException) {
+            throw IOException("加载数据异常，请重启应用！", e)
+        }
+
+        val plwList: ArrayList<PLW>
+        try {
+            val elements = document.select("#tablelist tr.t_tr1")
+
+            plwList = ArrayList(elements.size)
+            elements.forEachReversedByIndex {
+                val id = it.child(0).text()
+                val balls = it.child(1).text()
+                val saleAmount = it.child(3).text()
+                val date = it.child(4).text()
+
+                val pls = PLW(id, balls, date, saleAmount)
+                plwList.add(pls)
+            }
+
+            withContext(Dispatchers.Main) {
+                log("> 解析数据完毕，正在保存数据……\n")
+            }
+        } catch (e: Throwable) {
+            throw RuntimeException("解析数据异常，请重启应用！", e)
+        }
+
+        //save to SQLite database
+        try {
+            PLWTable.save(plwList)
+            withContext(Dispatchers.Main) {
+                log("> 保存数据完毕, 共保存 ${plwList.size} 条数据\n")
+            }
+
+        } catch (e: Throwable) {
+            throw RuntimeException("保存数据异常", e)
+        }
+    }
 
     private fun log(msg: String) {
         logText.append(msg)

@@ -54,7 +54,6 @@ import zilu.lottery.analysis.data.Download
 import zilu.lottery.analysis.data.DownloadCompleteReceiver
 import zilu.lottery.analysis.gson
 import zilu.lottery.analysis.widget.UpdateInfoDialog
-import java.io.IOException
 import java.net.URL
 
 class MainActivity : AppCompatActivity() {
@@ -93,7 +92,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkVersionUpdate() {
         doAsync {
             try {
-                val json = URL(BuildConfig.RAW_URL).readText()
+                val json = URL(BuildConfig.UPDATE_PROXY + BuildConfig.RAW_URL).readText()
                 Log.d(TAG, "updateInfo: $json")
                 val updateInfo = gson.fromJson(json, UpdateInfo::class.java)
                 if (updateInfo.code > BuildConfig.VERSION_CODE) {
@@ -101,7 +100,8 @@ class MainActivity : AppCompatActivity() {
                         doUpdate(updateInfo)
                     }
                 }
-            } catch (e: IOException) {
+            } catch (e: Exception) {
+                uiThread { toast(R.string.toast_check_update_error) }
                 e.printStackTrace()
             }
         }
@@ -116,32 +116,11 @@ class MainActivity : AppCompatActivity() {
             setSecondTitle("版本号: v${updateInfo.name}")
             setContentDesc(updateInfo.des)
             setConfirmBtnText(formatConfirmText)
-            setOnConfirmListener { downloadApk("https://ghproxy.com/${updateInfo.url}", this) }
+            setOnConfirmListener { downloadApk(BuildConfig.UPDATE_PROXY + updateInfo.url, this) }
         }.show()
     }
 
     private fun downloadApk(url: String, dialog: UpdateInfoDialog) {
-//        if (downloadCompleteReceiver == null) {
-//            downloadCompleteReceiver = DownloadCompleteReceiver()
-//                .setCallback(object : DownloadCompleteReceiver.Callback {
-//                    override fun onFail(id: Long) {
-//                        unregisterReceiver(downloadCompleteReceiver)
-//                        downloadCompleteReceiver = null
-//                        Log.e(TAG, "download Fail: $id")
-//                    }
-//
-//                    override fun onSuccess(uri: Uri, id: Long) {
-//                        Log.e(TAG, "download Success")
-//                        unregisterReceiver(downloadCompleteReceiver)
-//                        downloadCompleteReceiver = null
-////                        installApk(uri)
-//                    }
-//                })
-//        }
-//        registerReceiver(
-//            downloadCompleteReceiver,
-//            IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
-//        )
         val taskId = Download.apk(this, url)
 //        Log.d(TAG, "taskId: $taskId")
         contentObserver = DownloadChangeObserver(this, taskId).also { observer ->

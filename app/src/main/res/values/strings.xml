@@ -41,6 +41,7 @@
     <string name="toast_update_in_background">正在后台下载应用，请不要退出！</string>
     <string name="toast_download_success">下载成功,请点击[立即安装]</string>
     <string name="toast_download_fail">下载失败</string>
+    <string name="toast_check_update_error">检查App更新失败</string>
     <string name="dialog_confirm_text">马上更新 (%.1fM)</string>
     <string name="dialog_cancel_text">下次再说</string>
 
@@ -48,10 +49,11 @@
     <string name="user_agent">Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0</string>
     <string name="lottery_history_url">https://datachart.500.com/dlt/history/newinc/history.php?start=%s&amp;end=</string>
     <string name="ssq_history_url">https://datachart.500.com/ssq/history/newinc/history.php?start=%s&amp;end=</string>
-    <string name="pls_history_url">https://datachart.500.com/pls/history/inc/history.php?limit=-1&amp;start=%s&amp;end=</string>
-    <string name="plw_history_url">https://datachart.500.com/plw/history/inc/history.php?limit=-1&amp;start=%s&amp;end=</string>
-    <string name="sd_history_url">https://datachart.500.com/sd/history/inc/history.php?limit=-1&amp;start=%s&amp;end=%s</string>
+    <string name="pls_history_url">https://datachart.500.com/pls/history/inc/history.php?limit=%d&amp;start=%s&amp;end=</string>
+    <string name="plw_history_url">https://datachart.500.com/plw/history/inc/history.php?limit=%d&amp;start=%s&amp;end=</string>
+    <string name="sd_history_url">https://datachart.500.com/sd/history/inc/history.php?limit=%d&amp;start=%s&amp;end=%s</string>
     <string name="format_release_jackpot">奖池累计%s亿</string>
+    <string name="format_release_sale_amount">销售总额%s亿</string>
 
     <string name="prompt_issue">按期数筛选</string>
     <string name="prompt_year">按年份筛选</string>
@@ -120,5 +122,6 @@
         <item>后区数据</item>
     </string-array>
 
-    <string name="readme_partition_type"><b>解释说明<span>&#128071;</span>:</b>\n\n<b>当前统计: </b>是指通过按期数或按年份进行筛选数据之后的数据统计结果\n\n<b>(xx年)统计: </b>这里只显示本年度已开奖的数据统计结果\n\n<b>历史统计: </b>这里显示的是所有的历史开奖数据的统计结果</string>
+    <string name="readme_partition_type"><b>解释说明<span>&#128071;</span>:</b>\n\n<b>当前统计: </b>是指通过按期数或按年份进行筛选数据之后的数据统计结果\n\n<b>(xx年)统计: </b>这里只显示本年度已开奖的数据统计结果\n\n<b>历史统计: </b>这里显示的是所有的历史开奖数据的统计结果\n\n<b>注：本软件不对任何开奖号码进行预测，也不对任何开奖中奖结果负责，本软件只对历史开奖数据进行统计分析，分析结果仅供参考。</b></string>
+    <string name="readme_partition_type_continuation"><b>解释说明<span>&#128071;</span>:</b>\n各区形态连续分析旨在统计连续多期出相同区形态的开奖号码的占比，根据得出的占比可以看出哪些区形态出现的概率高，以及连续出现多次的概率有多大等信息\n\n<b>当前统计: </b>是指通过按期数或按年份进行筛选数据之后的数据统计结果\n\n<b>注：本软件不对任何开奖号码进行预测，也不对任何开奖中奖结果负责，本软件只对历史开奖数据进行统计分析，分析结果仅供参考。</b></string>
 </resources>

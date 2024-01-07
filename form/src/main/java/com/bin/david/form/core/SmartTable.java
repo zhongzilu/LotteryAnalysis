@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -651,6 +652,10 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
      * 可以在Activity onDestroy释放
      */
     private void release() {
+        final Handler handler = getHandler();
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
         if (matrixHelper != null) {
             matrixHelper.unRegisterAll();
         }

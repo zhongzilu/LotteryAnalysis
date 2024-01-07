@@ -48,7 +48,7 @@ import zilu.lottery.analysis.bean.Lottery
 import zilu.lottery.analysis.data.Constants
 import zilu.lottery.analysis.data.DataUtils
 import zilu.lottery.analysis.table.BallColumnDrawFormat
-import zilu.lottery.analysis.table.MyContentCellBackgroundFormat
+import zilu.lottery.analysis.table.MyDLTBasicContentCellBackgroundFormat
 import zilu.lottery.analysis.ui.BaseFragment
 import zilu.lottery.analysis.widget.MyFilterSpinner
 import zilu.lottery.annotation.Val
@@ -91,7 +91,7 @@ class BasicFragment : BaseFragment(), Observer<Int>, MyFilterSpinner.OnItemSelec
         val vPadding = DensityUtils.dp2px(activity, Val.V_PADDING)
         val hPadding = DensityUtils.dp2px(activity, Val.H_PADDING)
         table.config
-            .setContentCellBackgroundFormat(MyContentCellBackgroundFormat())
+            .setContentCellBackgroundFormat(MyDLTBasicContentCellBackgroundFormat())
             .setColumnTitleBackground { canvas, rect, paint ->
                 paint.color = Constants.cellBackgroundColor
                 paint.style = Paint.Style.FILL
@@ -106,7 +106,7 @@ class BasicFragment : BaseFragment(), Observer<Int>, MyFilterSpinner.OnItemSelec
             .setShowYSequence(false)
             .isShowTableTitle = false
 
-        table.setZoom(false, 1f, .5f)
+        table.setZoom(true, 1f, .5f)
         table.setOnSmartTableInvalidateListener {
             initData = false
         }

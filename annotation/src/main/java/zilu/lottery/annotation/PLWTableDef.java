@@ -60,9 +60,9 @@ public @interface PLWTableDef {
     String RED_BALLS = "rballs";
 
     /**
-     * 奖池金额
+     * 销售总金额
      */
-    String JACKPOT = "jackpot";
+    String SALE_AMOUNT = "amount";
 
     /**
      * 日期

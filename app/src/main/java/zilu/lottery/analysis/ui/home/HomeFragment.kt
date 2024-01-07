@@ -83,9 +83,9 @@ class HomeFragment : BaseFragment() {
     private fun initHomeRecycler(homeRecycler: RecyclerView) {
         val items = listOf(
             HomeGridAdapter.HomeGridItem("lt", R.mipmap.ic_lottery, "大乐透"),
+            HomeGridAdapter.HomeGridItem("ssq", R.mipmap.ic_ssq, "双色球"),
             HomeGridAdapter.HomeGridItem("r3", R.mipmap.ic_rank3, "排列三"),
             HomeGridAdapter.HomeGridItem("r5", R.mipmap.ic_rank5, "排列五"),
-            HomeGridAdapter.HomeGridItem("ssq", R.mipmap.ic_ssq, "双色球"),
             HomeGridAdapter.HomeGridItem("3d", R.mipmap.ic_3d, "福彩3D"),
         )
         mHomeAdapter = HomeGridAdapter(items).setOnItemClickListener(homeRecyclerListener)

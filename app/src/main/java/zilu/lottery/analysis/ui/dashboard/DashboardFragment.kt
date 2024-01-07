@@ -49,6 +49,7 @@ import zilu.lottery.analysis.data.LotteryTable
 import zilu.lottery.analysis.data.MapTable
 import zilu.lottery.analysis.ui.BaseFragment
 import java.io.IOException
+import java.net.Proxy
 
 class DashboardFragment : BaseFragment() {
 
@@ -112,7 +113,9 @@ class DashboardFragment : BaseFragment() {
             try {
                 val url = getString(R.string.lottery_history_url, startId)
                 document = Jsoup.connect(url)
+                    .proxy(Proxy.NO_PROXY)
                     .userAgent(getString(R.string.user_agent))
+                    .maxBodySize(0)
                     .get()
 
                 uiThread {

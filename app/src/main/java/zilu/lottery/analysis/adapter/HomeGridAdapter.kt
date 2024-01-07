@@ -29,10 +29,6 @@
 
 package zilu.lottery.analysis.adapter
 
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import android.text.style.RelativeSizeSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -103,7 +99,6 @@ class ReleaseRecyclerAdapter(private val items: MutableList<ReleaseItem>) :
     private var itemClickListener: RVItemClickListener<VH>? = null
 
     inner class VH(v: View) : RecyclerView.ViewHolder(v) {
-        val ctx = itemView.context.resources
         val iconView: ImageView = v.findViewById(R.id.itemIcon)
         val itemTitle: TextView = v.findViewById(R.id.itemTitle)
         val itemReleaseDate: TextView = v.findViewById(R.id.itemReleaseDate)
@@ -127,13 +122,14 @@ class ReleaseRecyclerAdapter(private val items: MutableList<ReleaseItem>) :
         holder.itemTitle.text = item.title
         holder.itemReleaseDate.text = item.date
         holder.itemQiHao.text = item.qihao
-        val jackpotDesc = holder.ctx.getString(R.string.format_release_jackpot, item.jackpot)
-        holder.itemJackpot.text = SpannableStringBuilder(jackpotDesc).apply {
-            val color = ForegroundColorSpan(holder.ctx.getColor(R.color.colorPrimary))
-            val size = RelativeSizeSpan(1.5f)
-            setSpan(color, 4, jackpotDesc.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
-            setSpan(size, 4, jackpotDesc.lastIndex, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
-        }
+//        val jackpotDesc = holder.ctx.getString(R.string.format_release_jackpot, item.jackpot)
+//        holder.itemJackpot.text = SpannableStringBuilder(jackpotDesc).apply {
+//            val color = ForegroundColorSpan(holder.ctx.getColor(R.color.colorPrimary))
+//            val size = RelativeSizeSpan(1.5f)
+//            setSpan(color, 4, jackpotDesc.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+//            setSpan(size, 4, jackpotDesc.lastIndex, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+//        }
+        holder.itemJackpot.text = item.jackpot
         holder.releaseBallView.setFormatBallString(item.balls).show()
         val viewClickListener: ((View) -> Unit) = { v: View ->
             itemClickListener?.onItemClickListener(holder, v, position)

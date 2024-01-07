@@ -152,7 +152,7 @@ class Partition5MainFragment : BaseFragment(), MyFilterSpinner.OnItemSelectedLis
             .setMinTableWidth(displayMetrics.widthPixels)
             .isShowTableTitle = false
 
-        table.setZoom(false, 1f, .5f)
+        table.setZoom(true, 1f, .5f)
         table.setOnSmartTableInvalidateListener {
             initData = false
         }

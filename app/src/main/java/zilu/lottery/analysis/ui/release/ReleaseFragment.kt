@@ -31,6 +31,10 @@ package zilu.lottery.analysis.ui.release
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -47,6 +51,8 @@ import zilu.lottery.analysis.adapter.RVItemClickListener
 import zilu.lottery.analysis.adapter.ReleaseRecyclerAdapter
 import zilu.lottery.analysis.bean.ReleaseItem
 import zilu.lottery.analysis.data.LotteryTable
+import zilu.lottery.analysis.data.PLSTable
+import zilu.lottery.analysis.data.PLWTable
 import zilu.lottery.analysis.data.SSQTable
 import zilu.lottery.analysis.ui.BaseFragment
 import java.text.NumberFormat
@@ -88,7 +94,8 @@ class ReleaseFragment : BaseFragment(), RVItemClickListener<ReleaseRecyclerAdapt
 //            )
 //        }
         mAdapter = ReleaseRecyclerAdapter(items)
-        releaseRecycler.adapter = mAdapter.setOnItemClickListener(this)
+            .setOnItemClickListener(this)
+        releaseRecycler.adapter = mAdapter
     }
 
     private fun refreshData(callback: (() -> Unit)? = null) {
@@ -96,14 +103,17 @@ class ReleaseFragment : BaseFragment(), RVItemClickListener<ReleaseRecyclerAdapt
             items.clear()
             LotteryTable.findLatest()?.run {
                 val jackpot = NumberFormat.getNumberInstance().parse(jackpot)!!.toLong()
-                val format = String.format("%.2f", jackpot / 100000000f)
+                val format = getString(
+                    R.string.format_release_jackpot,
+                    String.format("%.2f", jackpot / 100000000f)
+                )
                 items.add(
                     ReleaseItem(
                         R.mipmap.ic_lottery,
                         "大乐透",
                         "每周一、三、六 21:25开奖",
                         "第${id}期 $date",
-                        format,
+                        buildSpannableString(format, 4),
                         balls
                     )
                 )
@@ -111,14 +121,53 @@ class ReleaseFragment : BaseFragment(), RVItemClickListener<ReleaseRecyclerAdapt
 
             SSQTable.findLatest()?.run {
                 val jackpot = NumberFormat.getNumberInstance().parse(jackpot)!!.toLong()
-                val format = String.format("%.2f", jackpot / 100000000f)
+                val format = getString(
+                    R.string.format_release_jackpot,
+                    String.format("%.2f", jackpot / 100000000f)
+                )
                 items.add(
                     ReleaseItem(
                         R.mipmap.ic_ssq,
                         "双色球",
                         "每周二、四、日 21:15开奖",
                         "第${id}期 $date",
-                        format,
+                        buildSpannableString(format, 4),
+                        balls
+                    )
+                )
+            }
+
+            PLSTable.findLatest()?.run {
+                val saleAmount = NumberFormat.getNumberInstance().parse(saleAmount)!!.toLong()
+                val format = getString(
+                    R.string.format_release_sale_amount,
+                    String.format("%.2f", saleAmount / 100000000f)
+                )
+                items.add(
+                    ReleaseItem(
+                        R.mipmap.ic_rank3,
+                        "排列三",
+                        "每日 21:25开奖",
+                        "第${id}期 $date",
+                        buildSpannableString(format, 4),
+                        balls
+                    )
+                )
+            }
+
+            PLWTable.findLatest()?.run {
+                val saleAmount = NumberFormat.getNumberInstance().parse(saleAmount)!!.toLong()
+                val format = getString(
+                    R.string.format_release_sale_amount,
+                    String.format("%.2f", saleAmount / 100000000f)
+                )
+                items.add(
+                    ReleaseItem(
+                        R.mipmap.ic_rank5,
+                        "排列五",
+                        "每日 21:25开奖",
+                        "第${id}期 $date",
+                        buildSpannableString(format, 4),
                         balls
                     )
                 )
@@ -156,4 +205,12 @@ class ReleaseFragment : BaseFragment(), RVItemClickListener<ReleaseRecyclerAdapt
         toast.setGravity(Gravity.CENTER, 0, 0)
         toast.show()
     }
+
+    private fun buildSpannableString(text: String, start: Int) =
+        SpannableStringBuilder(text).apply {
+            val color = ForegroundColorSpan(resources.getColor(R.color.colorPrimary))
+            val size = RelativeSizeSpan(1.5f)
+            setSpan(color, start, text.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+            setSpan(size, start, text.lastIndex, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+        }
 }

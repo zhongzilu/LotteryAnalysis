@@ -66,7 +66,7 @@ class R5PTypeContinuationFragment(private val name: String) : BaseFragment(),
         root.findViewById<MyFilterSpinner>(R.id.filterSpinner)
             .setOnItemSelectedListener(this)
         val readme = root.findViewById<TextView>(R.id.readmeText)
-        readme.setText(R.string.readme_partition_type)
+        readme.setText(R.string.readme_partition_type_continuation)
         readme.visibility = View.VISIBLE
         table = root.findViewById(R.id.table)
         return root

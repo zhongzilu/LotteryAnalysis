@@ -35,7 +35,6 @@ import zilu.lottery.analysis.gson
  * 排列三
  * Create by zilu 2023/09/22
  */
-
 class PLS {
 
     @JvmField
@@ -43,6 +42,9 @@ class PLS {
 
     @JvmField
     val balls: String
+
+    @JvmField
+    val miss: Array<Int>
 
     //红球组
     @JvmField
@@ -52,26 +54,26 @@ class PLS {
     val date: String
 
     @JvmField
-    val jackpot: String
+    val saleAmount: String
 
-    constructor(id: String, balls: String, date: String, jackpot: String) {
-        val split = balls.split("+")
-        if (split.size < 2) throw IllegalArgumentException("Error: balls format invalidate, like: `1 2 3 4 5+2 3`")
+    constructor(id: String, balls: String, date: String, saleAmount: String) {
         this.id = id
         this.balls = balls
-        this.redBalls = split[0].split(" ").map { it.toInt() }
+        this.redBalls = balls.split(" ").map { it.toInt() }
+        this.miss = emptyArray()
         this.date = date
-        this.jackpot = jackpot
+        this.saleAmount = saleAmount
     }
 
     constructor(
-        id: String, balls: String, rBalls: List<Int>, jackpot: String, date: String
+        id: String, balls: String, miss: List<Int>, rBalls: List<Int>, saleAmount: String, date: String
     ) {
         this.id = id
         this.balls = balls
+        this.miss = miss.toTypedArray()
         this.redBalls = rBalls
         this.date = date
-        this.jackpot = jackpot
+        this.saleAmount = saleAmount
     }
 
     override fun toString(): String = gson.toJson(this)
